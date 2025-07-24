@@ -28,5 +28,13 @@
 This project uses environment variables stored in a `.env` file for sensitive information such as database credentials.
 
 1. Copy the example file:
+    ```bash
+    cp .env.example .env
+    ```
+
+## How to Run
+
+Build and start all services with Docker Compose:
+
 ```bash
-cp .env.example .env
+docker compose up --build
