@@ -11,8 +11,8 @@ services:
   frontend:
     build: ./frontend
     volumes:
-      - ./frontend:/app
-      - /app/node_modules
+      - ./frontend:/app/frontend
+      - /app/frontend/node_modules
     ports:
       - "5173:5173"
     stdin_open: true
