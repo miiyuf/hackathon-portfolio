@@ -7,7 +7,7 @@
 | symbol     | varchar(10)        | NO   | MUL | NULL    |                |
 | cost_price | decimal(10,2)      | NO   |     | NULL    |                |
 | action     | enum('buy','sell') | NO   |     | NULL    |                |
-| quantity   | int                | YES  |     | 1       |                |
+| quantity   | int                | NO   |     | 1       |                |
 
 ## Table: `stock_master`
 | Field  | Type         | Null | Key | Default | Extra |
