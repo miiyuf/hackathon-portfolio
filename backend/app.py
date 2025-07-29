@@ -3,11 +3,20 @@ from dotenv import load_dotenv
 import os
 import mysql.connector
 from mysql.connector import Error
+from flask import Flask
+from app.routers.stock import stock_bp
+from app.routers.trade import trade_bp
+
 
 # Load .env file
 load_dotenv()
 
 app = Flask(__name__)
+
+# Register blueprints for stock and trade routes
+app.register_blueprint(stock_bp)
+app.register_blueprint(trade_bp)
+
 
 def get_db_connection():
     try:
