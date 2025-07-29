@@ -6,6 +6,7 @@ from mysql.connector import Error
 from flask import Flask
 from app.routers.stock import stock_bp
 from app.routers.trade import trade_bp
+import yfinance as yf
 
 
 # Load .env file
@@ -34,6 +35,22 @@ def get_db_connection():
         return connection
     except Error as e:
         print(f"MySQL connection error: {e}")
+        return None
+
+def get_real_price(symbol):
+    """
+    Fetch the real-time price of a stock using yfinance.
+    Args:
+        symbol (str): Stock symbol.
+    Returns:
+        float: Current price of the stock, or None if an error occurs.
+    """
+    try:
+        stock = yf.Ticker(symbol)
+        price = stock.history(period="1d")["Close"].iloc[-1]
+        return price
+    except Exception as e:
+        print(f"Error fetching price for {symbol}: {e}")
         return None
 
 @app.route('/api/stocks', methods=['GET'])
@@ -144,6 +161,20 @@ def get_holdings():
     conn.close()
 
     return jsonify(results)
+
+@app.route('/api/price/<symbol>', methods=['GET'])
+def get_stock_price(symbol):
+    """
+    Retrieve the real-time price of a stock using its symbol.
+    Args:
+        symbol (str): Stock symbol passed as a URL parameter.
+    Returns:
+        JSON response with the current price or an error message if the price cannot be fetched.
+    """
+    price = get_real_price(symbol)
+    if price is None:
+        return jsonify({"error": f"Could not fetch price for symbol: {symbol}"}), 500
+    return jsonify({"symbol": symbol, "price": price})
 
 if __name__ == '__main__':
     app.run(host='0.0.0.0', port=8000, debug=True)
