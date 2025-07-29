@@ -1,5 +1,5 @@
 # Use the latest LTS version of Node.js
-FROM node:22-alpine
+FROM node:20-bullseye
 
 # Set the working directory inside the container
 WORKDIR /app/frontend
@@ -7,11 +7,11 @@ WORKDIR /app/frontend
 # Copy package.json and package-lock.json
 COPY package*.json ./
 
-# Copy the rest of your application files
-COPY . .
-
 # Install dependencies
 RUN npm install
+
+# Copy the rest of your application files
+COPY . .
 
 # Expose the port your app runs on
 EXPOSE 5173

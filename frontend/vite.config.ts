@@ -1,12 +1,15 @@
 import { defineConfig } from 'vite'
 import react from '@vitejs/plugin-react-swc'
-import tailwindcss from '@tailwindcss/vite'
 
 // https://vite.dev/config/
 export default defineConfig({
-    plugins: [react(), tailwindcss()],
+    plugins: [
+        react({
+            jsxImportSource: '@emotion/react',
+        }),
+    ],
     optimizeDeps: {
-        include: ['react', 'react-dom', '@material-tailwind/react'],
+        include: ['react', 'react-dom'],
     },
     resolve: {
         dedupe: ['react', 'react-dom'],
