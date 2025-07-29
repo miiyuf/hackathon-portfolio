@@ -3,7 +3,6 @@ from dotenv import load_dotenv
 import os
 import mysql.connector
 from mysql.connector import Error
-from flask import Flask
 from app.routers.stock import stock_bp
 from app.routers.trade import trade_bp
 import yfinance as yf
@@ -23,7 +22,7 @@ def get_db_connection():
     """
     Establish a connection to the MySQL database using credentials from environment variables.
     Returns:
-        A MySQL connection object if successful, or None if the connection fails.
+        A MySQL connection object if successful, or a JSON response with an error message if the connection fails.
     """
     try:
         connection = mysql.connector.connect(
@@ -34,8 +33,9 @@ def get_db_connection():
         )
         return connection
     except Error as e:
-        print(f"MySQL connection error: {e}")
-        return None
+        error_message = f"MySQL connection error: {e}"
+        print(error_message)
+        return jsonify({"error": error_message}), 500
 
 def get_real_price(symbol):
     """
@@ -43,15 +43,16 @@ def get_real_price(symbol):
     Args:
         symbol (str): Stock symbol.
     Returns:
-        float: Current price of the stock, or None if an error occurs.
+        float: Current price of the stock, or a JSON response with an error message if an error occurs.
     """
     try:
         stock = yf.Ticker(symbol)
         price = stock.history(period="1d")["Close"].iloc[-1]
         return price
     except Exception as e:
-        print(f"Error fetching price for {symbol}: {e}")
-        return None
+        error_message = f"Error fetching price for {symbol}: {e}"
+        print(error_message)
+        return jsonify({"error": error_message}), 500
 
 @app.route('/api/stocks', methods=['GET'])
 def get_stocks():
@@ -61,8 +62,8 @@ def get_stocks():
         JSON response with the list of stocks or an error message if the DB connection fails.
     """
     conn = get_db_connection()
-    if conn is None:
-        return jsonify({"error": "DB connection failed"}), 500
+    if isinstance(conn, tuple):
+        return conn
 
     cursor = conn.cursor(dictionary=True)
     cursor.execute("SELECT * FROM stocks;")
@@ -92,8 +93,8 @@ def insert_stock():
         return jsonify({"error": "Missing required fields"}), 400
 
     conn = get_db_connection()
-    if conn is None:
-        return jsonify({"error": "DB connection failed"}), 500
+    if isinstance(conn, tuple):
+        return conn
 
     try:
         cursor = conn.cursor()
@@ -125,8 +126,8 @@ def get_transactions():
         JSON response with the list of transactions or an error message if the DB connection fails.
     """
     conn = get_db_connection()
-    if conn is None:
-        return jsonify({"error": "DB connection failed"}), 500
+    if isinstance(conn, tuple):
+        return conn
 
     cursor = conn.cursor(dictionary=True)
     cursor.execute("SELECT * FROM stocks ORDER BY id DESC;")
@@ -144,8 +145,8 @@ def get_holdings():
         JSON response with the list of holdings or an error message if the DB connection fails.
     """
     conn = get_db_connection()
-    if conn is None:
-        return jsonify({"error": "DB connection failed"}), 500
+    if isinstance(conn, tuple):
+        return conn
 
     cursor = conn.cursor(dictionary=True)
     query = """
@@ -172,9 +173,90 @@ def get_stock_price(symbol):
         JSON response with the current price or an error message if the price cannot be fetched.
     """
     price = get_real_price(symbol)
-    if price is None:
-        return jsonify({"error": f"Could not fetch price for symbol: {symbol}"}), 500
+    if isinstance(price, tuple):
+        return price
     return jsonify({"symbol": symbol, "price": price})
+
+@app.route('/api/portfolio', methods=['GET'])
+def get_portfolio():
+    """
+    Retrieve the portfolio, including holdings and their current prices.
+    Returns:
+        JSON response with the portfolio details or an error message if the DB connection fails.
+    """
+    conn = get_db_connection()
+    if isinstance(conn, tuple):
+        return conn
+
+    cursor = conn.cursor(dictionary=True)
+    query = """
+        SELECT symbol, name, 
+            SUM(CASE WHEN action = 'buy' THEN quantity ELSE -quantity END) AS total_quantity
+        FROM stocks
+        GROUP BY symbol, name
+        HAVING total_quantity > 0;
+    """
+    cursor.execute(query)
+    holdings = cursor.fetchall()
+    cursor.close()
+    conn.close()
+
+    portfolio = []
+    for holding in holdings:
+        symbol = holding['symbol']
+        current_price = get_real_price(symbol)
+        if isinstance(current_price, tuple):
+            return current_price
+        if current_price is not None:
+            holding['current_price'] = current_price
+            holding['total_value'] = current_price * holding['total_quantity']
+        else:
+            holding['current_price'] = None
+            holding['total_value'] = None
+        portfolio.append(holding)
+
+    return jsonify(portfolio)
+
+@app.route('/api/profit_loss', methods=['GET'])
+def get_profit_loss():
+    """
+    Calculate the profit or loss for each holding based on the current price and cost price.
+    Returns:
+        JSON response with the profit/loss details for each holding or an error message if the DB connection fails.
+    """
+    conn = get_db_connection()
+    if isinstance(conn, tuple):
+        return conn
+
+    cursor = conn.cursor(dictionary=True)
+    query = """
+        SELECT symbol, name, cost_price,
+            SUM(CASE WHEN action = 'buy' THEN quantity ELSE -quantity END) AS total_quantity
+        FROM stocks
+        GROUP BY symbol, name, cost_price
+        HAVING total_quantity > 0;
+    """
+    cursor.execute(query)
+    holdings = cursor.fetchall()
+    cursor.close()
+    conn.close()
+
+    profit_loss_data = []
+    for holding in holdings:
+        symbol = holding['symbol']
+        current_price = get_real_price(symbol)
+        if isinstance(current_price, tuple):
+            return current_price
+        if current_price is not None:
+            profit_loss = (current_price - holding['cost_price']) * holding['total_quantity']
+            holding['current_price'] = current_price
+            holding['profit_loss'] = profit_loss
+        else:
+            holding['current_price'] = None
+            holding['profit_loss'] = None
+        profit_loss_data.append(holding)
+
+    return jsonify(profit_loss_data)
 
 if __name__ == '__main__':
     app.run(host='0.0.0.0', port=8000, debug=True)
