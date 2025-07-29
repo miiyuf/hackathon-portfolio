@@ -1,51 +1,13 @@
 import React from 'react'
-import UserStocks from '../components/UserStocks'
-import {
-    Drawer,
-    Toolbar,
-    Divider,
-    List,
-    ListItem,
-    ListItemButton,
-    ListItemIcon,
-    ListItemText,
-    Typography,
-} from '@mui/material'
-import SpaceDashboardIcon from '@mui/icons-material/SpaceDashboard'
-
-function Home() {
+import UserStocksTable from '../components/UserStocksTable'
+interface HomeProps {
+    handleTradingAction: (open: boolean) => void
+}
+function Home(props: HomeProps) {
+    const { handleTradingAction } = props
     return (
-        <div style={{ display: 'flex' }}>
-            <Drawer
-                sx={{
-                    width: 240,
-                    flex: 'grow',
-                    flexShrink: 0,
-                    '& .MuiDrawer-paper': {
-                        width: 240,
-                    },
-                }}
-                variant="permanent"
-                anchor="left"
-            >
-                <Toolbar>
-                    <Typography variant="h4">Portfolio</Typography>
-                </Toolbar>
-                <Divider />
-                <List>
-                    {['Dashboard'].map((text, index) => (
-                        <ListItem key={text} disablePadding>
-                            <ListItemButton>
-                                <ListItemIcon>
-                                    <SpaceDashboardIcon />
-                                </ListItemIcon>
-                                <ListItemText primary={text} />
-                            </ListItemButton>
-                        </ListItem>
-                    ))}
-                </List>
-            </Drawer>
-            <UserStocks />
+        <div style={{ display: 'flex', marginLeft: 240 }}>
+            <UserStocksTable handleTradingAction={handleTradingAction} />
         </div>
     )
 }
