@@ -33,7 +33,11 @@ function Sidebar() {
                 <Typography variant="h4">Portfolio</Typography>
             </Toolbar>
             <Divider />
-            <List>
+            <List
+                sx={{
+                    paddingTop: 0,
+                }}
+            >
                 <ListItem
                     key={'dashboard'}
                     disablePadding

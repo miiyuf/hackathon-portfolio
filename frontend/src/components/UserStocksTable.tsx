@@ -1,4 +1,5 @@
 import * as React from 'react'
+import { useState, useEffect } from 'react'
 import { alpha } from '@mui/material/styles'
 import {
     Box,
@@ -20,7 +21,7 @@ import {
 } from '@mui/material'
 import { visuallyHidden } from '@mui/utils'
 
-interface Data {
+interface StockData {
     id: number
     ticker: string
     stockName: string
@@ -31,10 +32,18 @@ interface Data {
 const rows = [
     { id: 1, ticker: 'AAPL', stockName: 'Apple', qty: 10, costPrice: 35 },
     { id: 2, ticker: 'NFLX', stockName: 'Netflix', qty: 40, costPrice: 200 },
-    { id: 3, ticker: 'NVDA', stockName: 'NVIDIA', qty: 40, costPrice: 160.7 },
-    { id: 4, ticker: 'NVDA', stockName: 'NVIDIA', qty: 40, costPrice: 160 },
-    { id: 5, ticker: 'NVDA', stockName: 'NVIDIA', qty: 40, costPrice: 160 },
-    { id: 6, ticker: 'NVDA', stockName: 'NVIDIA', qty: 40, costPrice: 160 },
+    { id: 3, ticker: 'NVDA', stockName: 'Nvidia', qty: 40, costPrice: 160.7 },
+    { id: 4, ticker: 'GOOGL', stockName: 'Alphabet', qty: 15, costPrice: 2800 },
+    { id: 5, ticker: 'AMZN', stockName: 'Amazon', qty: 8, costPrice: 3400 },
+    { id: 6, ticker: 'TSLA', stockName: 'Tesla', qty: 12, costPrice: 700 },
+    { id: 7, ticker: 'MSFT', stockName: 'Microsoft', qty: 25, costPrice: 295 },
+    {
+        id: 8,
+        ticker: 'META',
+        stockName: 'Meta Platforms',
+        qty: 18,
+        costPrice: 355,
+    },
 ]
 
 function descendingComparator<T>(a: T, b: T, orderBy: keyof T) {
@@ -63,7 +72,7 @@ function getComparator<Key extends keyof any>(
 
 interface HeadCell {
     disablePadding: boolean
-    id: keyof Data
+    id: keyof StockData
     label: string
     numeric: boolean
 }
@@ -71,13 +80,13 @@ interface HeadCell {
 const headCells: readonly HeadCell[] = [
     {
         id: 'ticker',
-        numeric: true,
+        numeric: false,
         disablePadding: false,
         label: 'Ticker',
     },
     {
         id: 'stockName',
-        numeric: true,
+        numeric: false,
         disablePadding: false,
         label: 'Stock Name',
     },
@@ -96,44 +105,34 @@ const headCells: readonly HeadCell[] = [
 ]
 
 interface EnhancedTableProps {
-    numSelected: number
     onRequestSort: (
         event: React.MouseEvent<unknown>,
-        property: keyof Data
+        property: keyof StockData
     ) => void
-    onSelectAllClick: (event: React.ChangeEvent<HTMLInputElement>) => void
     order: Order
     orderBy: string
-    rowCount: number
 }
 
 function EnhancedTableHead(props: EnhancedTableProps) {
-    const {
-        onSelectAllClick,
-        order,
-        orderBy,
-        numSelected,
-        rowCount,
-        onRequestSort,
-    } = props
+    const { order, orderBy, onRequestSort } = props
     const createSortHandler =
-        (property: keyof Data) => (event: React.MouseEvent<unknown>) => {
+        (property: keyof StockData) => (event: React.MouseEvent<unknown>) => {
             onRequestSort(event, property)
         }
 
     return (
         <TableHead>
             <TableRow>
-                <TableCell padding="checkbox">
+                {/* <TableCell padding="checkbox">
                     <Checkbox
                         color="primary"
                         indeterminate={
                             numSelected > 0 && numSelected < rowCount
                         }
                         checked={rowCount > 0 && numSelected === rowCount}
-                        onChange={onSelectAllClick}
                     />
-                </TableCell>
+                </TableCell> */}
+                <TableCell padding="checkbox"></TableCell>
                 {headCells.map((headCell) => (
                     <TableCell
                         key={headCell.id}
@@ -212,7 +211,7 @@ function EnhancedTableToolbar(props: EnhancedTableToolbarProps) {
                             color: 'white',
                             backgroundColor: '#7cbf8e',
                             '&:focus': {
-                                outline: '2px solid #7cbf8e', // custom border color
+                                outline: '2px solid #7cbf8e',
                                 outlineOffset: '2px',
                             },
                         }}
@@ -227,57 +226,40 @@ function EnhancedTableToolbar(props: EnhancedTableToolbarProps) {
 }
 interface UserStocksTableProps {
     handleTradingAction: (open: boolean) => void
+    handleSymbolSelect: (symbol: string) => void
 }
 export default function UserStocksTable(props: UserStocksTableProps) {
-    const { handleTradingAction } = props
+    const { handleTradingAction, handleSymbolSelect } = props
     const [order, setOrder] = React.useState<Order>('asc')
-    const [orderBy, setOrderBy] = React.useState<keyof Data>('ticker')
-    const [selected, setSelected] = React.useState<readonly number[]>([])
+    const [orderBy, setOrderBy] = React.useState<keyof StockData>('ticker')
+    const [selectedId, setSelectedId] = useState(-1)
     const [page, setPage] = React.useState(0)
     const [dense, setDense] = React.useState(false)
     const [rowsPerPage, setRowsPerPage] = React.useState(5)
+    const [selectedSymbol, setSelectedSymbol] = useState('')
 
     const handleUserOpen = () => {
+        handleSymbolSelect(selectedSymbol)
         handleTradingAction(true)
     }
 
     const handleRequestSort = (
         event: React.MouseEvent<unknown>,
-        property: keyof Data
+        property: keyof StockData
     ) => {
         const isAsc = orderBy === property && order === 'asc'
         setOrder(isAsc ? 'desc' : 'asc')
         setOrderBy(property)
     }
 
-    const handleSelectAllClick = (
-        event: React.ChangeEvent<HTMLInputElement>
-    ) => {
-        if (event.target.checked) {
-            const newSelected = rows.map((n) => n.id)
-            setSelected(newSelected)
-            return
-        }
-        setSelected([])
-    }
-
     const handleClick = (event: React.MouseEvent<unknown>, id: number) => {
-        const selectedIndex = selected.indexOf(id)
-        let newSelected: readonly number[] = []
-
-        if (selectedIndex === -1) {
-            newSelected = newSelected.concat(selected, id)
-        } else if (selectedIndex === 0) {
-            newSelected = newSelected.concat(selected.slice(1))
-        } else if (selectedIndex === selected.length - 1) {
-            newSelected = newSelected.concat(selected.slice(0, -1))
-        } else if (selectedIndex > 0) {
-            newSelected = newSelected.concat(
-                selected.slice(0, selectedIndex),
-                selected.slice(selectedIndex + 1)
-            )
+        const selectedRow = rows.find((row) => row.id === id)
+        setSelectedSymbol(selectedRow!.ticker)
+        if (id === selectedId) {
+            setSelectedId(-1)
+        } else {
+            setSelectedId(id)
         }
-        setSelected(newSelected)
     }
 
     const handleChangePage = (event: unknown, newPage: number) => {
@@ -311,7 +293,7 @@ export default function UserStocksTable(props: UserStocksTableProps) {
         <Box sx={{ width: '100%' }}>
             <Paper sx={{ width: '100%', mb: 2 }}>
                 <EnhancedTableToolbar
-                    numSelected={selected.length}
+                    numSelected={selectedId === -1 ? 0 : 1}
                     handleUserOpen={handleUserOpen}
                 />
                 <TableContainer>
@@ -321,16 +303,12 @@ export default function UserStocksTable(props: UserStocksTableProps) {
                         size={dense ? 'small' : 'medium'}
                     >
                         <EnhancedTableHead
-                            numSelected={selected.length}
                             order={order}
                             orderBy={orderBy}
-                            onSelectAllClick={handleSelectAllClick}
                             onRequestSort={handleRequestSort}
-                            rowCount={rows.length}
                         />
                         <TableBody>
                             {visibleRows.map((row, index) => {
-                                const isItemSelected = selected.includes(row.id)
                                 const labelId = `enhanced-table-checkbox-${index}`
 
                                 return (
@@ -340,27 +318,26 @@ export default function UserStocksTable(props: UserStocksTableProps) {
                                             handleClick(event, row.id)
                                         }
                                         role="checkbox"
-                                        aria-checked={isItemSelected}
                                         tabIndex={-1}
                                         key={row.id}
-                                        selected={isItemSelected}
+                                        selected={selectedId === row.id}
                                         sx={{ cursor: 'pointer' }}
                                     >
                                         <TableCell padding="checkbox">
                                             <Checkbox
                                                 color="primary"
-                                                checked={isItemSelected}
+                                                checked={selectedId === row.id}
                                             />
                                         </TableCell>
                                         <TableCell
                                             component="th"
                                             id={labelId}
                                             scope="row"
-                                            padding="none"
+                                            align="left"
                                         >
                                             {row.ticker}
                                         </TableCell>
-                                        <TableCell align="right">
+                                        <TableCell align="left">
                                             {row.stockName}
                                         </TableCell>
                                         <TableCell align="right">

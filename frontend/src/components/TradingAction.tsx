@@ -15,10 +15,18 @@ import {
 interface TradingActionProps {
     tradingActionModalOpen: boolean
     setTradingActionModalOpen: (open: boolean) => void
+    selectedSymbol?: string
+    setSelectedSymbol: (symbol: string) => void
 }
 function TradingAction(props: TradingActionProps) {
-    const { tradingActionModalOpen, setTradingActionModalOpen } = props
+    const {
+        tradingActionModalOpen,
+        setTradingActionModalOpen,
+        selectedSymbol,
+        setSelectedSymbol,
+    } = props
     const handleOpen = () => {
+        setSelectedSymbol('')
         setTradingActionModalOpen(true)
     }
     const handleClose = () => {
@@ -81,7 +89,7 @@ function TradingAction(props: TradingActionProps) {
                             label="Stock Symbol"
                             placeholder="ex: AAPL"
                             onChange={(e) => setSymbol(e.target.value)}
-                            value={symbol}
+                            value={selectedSymbol ? selectedSymbol : symbol}
                         ></TextField>
                         <TextField
                             required

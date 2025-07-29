@@ -6,23 +6,11 @@ import './App.css'
 import Home from './pages/Home'
 import { Route, Routes } from 'react-router-dom'
 import Trade from './pages/Trade'
-import {
-    Box,
-    Button,
-    FormControl,
-    InputLabel,
-    MenuItem,
-    Modal,
-    Select,
-    TextField,
-    Typography,
-    type SelectChangeEvent,
-} from '@mui/material'
-import React from 'react'
 import TradingAction from './components/TradingAction'
 
 function App() {
     const [tradingActionModalOpen, setTradingActionModalOpen] = useState(false)
+    const [selectedSymbol, setSelectedSymbol] = useState('')
     return (
         <div className="flex">
             <Sidebar />
@@ -30,7 +18,10 @@ function App() {
                 <Route
                     path="/"
                     element={
-                        <Home handleTradingAction={setTradingActionModalOpen} />
+                        <Home
+                            handleTradingAction={setTradingActionModalOpen}
+                            handleSymbolSelect={setSelectedSymbol}
+                        />
                     }
                 />
                 <Route path="/trade" element={<Trade />} />
@@ -38,6 +29,8 @@ function App() {
             <TradingAction
                 tradingActionModalOpen={tradingActionModalOpen}
                 setTradingActionModalOpen={setTradingActionModalOpen}
+                selectedSymbol={selectedSymbol}
+                setSelectedSymbol={setSelectedSymbol}
             />
         </div>
     )
