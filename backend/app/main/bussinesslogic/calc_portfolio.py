@@ -1,5 +1,6 @@
 import yfinance as yf
 from app.main.db import get_db_connection
+from mysql.connector import Error
 
 def get_real_price(symbol):
     """
@@ -32,17 +33,23 @@ def fetch_holdings(include_purchase_price=False):
         return []
 
     cursor = conn.cursor(dictionary=True)
-    query = """
-        SELECT symbol, name, 
-            SUM(CASE WHEN action = 'buy' THEN quantity ELSE -quantity END) AS total_quantity
-        {purchase_price_column}
-        FROM stocks
-        GROUP BY symbol, name {purchase_price_group}
-        HAVING total_quantity > 0;
-    """.format(
-        purchase_price_column=", purchase_price" if include_purchase_price else "",
-        purchase_price_group=", purchase_price" if include_purchase_price else ""
-    )
+    if include_purchase_price:
+        query = """
+            SELECT symbol, name, 
+                SUM(CASE WHEN action = 'buy' THEN quantity ELSE -quantity END) AS total_quantity,
+                purchase_price
+            FROM stocks
+            GROUP BY symbol, name, purchase_price
+            HAVING total_quantity > 0;
+        """
+    else:
+        query = """
+            SELECT symbol, name, 
+                SUM(CASE WHEN action = 'buy' THEN quantity ELSE -quantity END) AS total_quantity
+            FROM stocks
+            GROUP BY symbol, name
+            HAVING total_quantity > 0;
+        """
     cursor.execute(query)
     results = cursor.fetchall()
     cursor.close()

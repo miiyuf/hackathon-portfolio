@@ -6,7 +6,7 @@ holdings_bp = Blueprint('holdings', __name__, url_prefix='/api')
 @holdings_bp.route('/holdings', methods=['GET'])
 def get_holdings():
     """
-    Retrieve the curent holdings by calculating the net quantity of each stock.
+    Retrieve the current holdings by calculating the net quantity of each stock.
     Returns:
         JSON response with the list of holdings or an error message if the DB connection fails.
     """
