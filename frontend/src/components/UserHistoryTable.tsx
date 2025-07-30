@@ -41,7 +41,6 @@ function UserHistoryTable() {
             label: 'Action',
             minWidth: 70,
             align: 'left',
-            format: (value: number) => value.toLocaleString('en-US'),
         },
         {
             id: 'purchasePrice',
