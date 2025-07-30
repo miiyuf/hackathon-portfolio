@@ -1,6 +1,7 @@
 import * as React from 'react'
 import { useState, useEffect } from 'react'
 import { alpha } from '@mui/material/styles'
+import { useGlobalContext } from '../GlobalContext'
 import {
     Box,
     Table,
@@ -123,15 +124,6 @@ function EnhancedTableHead(props: EnhancedTableProps) {
     return (
         <TableHead>
             <TableRow>
-                {/* <TableCell padding="checkbox">
-                    <Checkbox
-                        color="primary"
-                        indeterminate={
-                            numSelected > 0 && numSelected < rowCount
-                        }
-                        checked={rowCount > 0 && numSelected === rowCount}
-                    />
-                </TableCell> */}
                 <TableCell padding="checkbox"></TableCell>
                 {headCells.map((headCell) => (
                     <TableCell
@@ -224,12 +216,8 @@ function EnhancedTableToolbar(props: EnhancedTableToolbarProps) {
         </Toolbar>
     )
 }
-interface UserStocksTableProps {
-    handleTradingAction: (open: boolean) => void
-    handleSymbolSelect: (symbol: string) => void
-}
-export default function UserStocksTable(props: UserStocksTableProps) {
-    const { handleTradingAction, handleSymbolSelect } = props
+
+export default function UserStocksTable() {
     const [order, setOrder] = React.useState<Order>('asc')
     const [orderBy, setOrderBy] = React.useState<keyof StockData>('ticker')
     const [selectedId, setSelectedId] = useState(-1)
@@ -238,9 +226,12 @@ export default function UserStocksTable(props: UserStocksTableProps) {
     const [rowsPerPage, setRowsPerPage] = React.useState(5)
     const [selectedSymbol, setSelectedSymbol] = useState('')
 
+    const { tradingModalState, tradingModalDispatch } = useGlobalContext()
     const handleUserOpen = () => {
-        handleSymbolSelect(selectedSymbol)
-        handleTradingAction(true)
+        tradingModalDispatch({
+            type: 'OPEN_MODAL_WITH_DATA',
+            state: { isOpen: true, symbol: selectedSymbol },
+        })
     }
 
     const handleRequestSort = (
