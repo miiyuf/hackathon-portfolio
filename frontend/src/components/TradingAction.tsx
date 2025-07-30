@@ -11,10 +11,10 @@ import {
     Typography,
     type SelectChangeEvent,
 } from '@mui/material'
-import { useGlobalContext } from '../GlobalContext'
+import { useTradingContext } from '../GlobalContext'
 
 function TradingAction() {
-    const { tradingModalState, tradingModalDispatch } = useGlobalContext()
+    const { tradingModalState, tradingModalDispatch } = useTradingContext()
 
     const handleOpen = () => {
         tradingModalDispatch({

@@ -1,7 +1,7 @@
 import * as React from 'react'
 import { useState, useEffect } from 'react'
 import { alpha } from '@mui/material/styles'
-import { useGlobalContext } from '../GlobalContext'
+import { useTradingContext } from '../GlobalContext'
 import {
     Box,
     Table,
@@ -21,6 +21,7 @@ import {
     Button,
 } from '@mui/material'
 import { visuallyHidden } from '@mui/utils'
+import { useUserStocksContext } from '../GlobalContext'
 
 interface StockData {
     id: number
@@ -29,23 +30,6 @@ interface StockData {
     qty: number
     costPrice: number
 }
-
-const rows = [
-    { id: 1, ticker: 'AAPL', stockName: 'Apple', qty: 10, costPrice: 35 },
-    { id: 2, ticker: 'NFLX', stockName: 'Netflix', qty: 40, costPrice: 200 },
-    { id: 3, ticker: 'NVDA', stockName: 'Nvidia', qty: 40, costPrice: 160.7 },
-    { id: 4, ticker: 'GOOGL', stockName: 'Alphabet', qty: 15, costPrice: 2800 },
-    { id: 5, ticker: 'AMZN', stockName: 'Amazon', qty: 8, costPrice: 3400 },
-    { id: 6, ticker: 'TSLA', stockName: 'Tesla', qty: 12, costPrice: 700 },
-    { id: 7, ticker: 'MSFT', stockName: 'Microsoft', qty: 25, costPrice: 295 },
-    {
-        id: 8,
-        ticker: 'META',
-        stockName: 'Meta Platforms',
-        qty: 18,
-        costPrice: 355,
-    },
-]
 
 function descendingComparator<T>(a: T, b: T, orderBy: keyof T) {
     if (b[orderBy] < a[orderBy]) {
@@ -225,8 +209,9 @@ export default function UserStocksTable() {
     const [dense, setDense] = React.useState(false)
     const [rowsPerPage, setRowsPerPage] = React.useState(5)
     const [selectedSymbol, setSelectedSymbol] = useState('')
+    const { userStocksState, userStocksDispatch } = useUserStocksContext()
 
-    const { tradingModalState, tradingModalDispatch } = useGlobalContext()
+    const { tradingModalState, tradingModalDispatch } = useTradingContext()
     const handleUserOpen = () => {
         tradingModalDispatch({
             type: 'OPEN_MODAL_WITH_DATA',
@@ -244,7 +229,7 @@ export default function UserStocksTable() {
     }
 
     const handleClick = (event: React.MouseEvent<unknown>, id: number) => {
-        const selectedRow = rows.find((row) => row.id === id)
+        const selectedRow = userStocksState.find((row) => row.id === id)
         setSelectedSymbol(selectedRow!.ticker)
         if (id === selectedId) {
             setSelectedId(-1)
@@ -270,18 +255,20 @@ export default function UserStocksTable() {
 
     // Avoid a layout jump when reaching the last page with empty rows.
     const emptyRows =
-        page > 0 ? Math.max(0, (1 + page) * rowsPerPage - rows.length) : 0
+        page > 0
+            ? Math.max(0, (1 + page) * rowsPerPage - userStocksState.length)
+            : 0
 
     const visibleRows = React.useMemo(
         () =>
-            [...rows]
+            [...userStocksState]
                 .sort(getComparator(order, orderBy))
                 .slice(page * rowsPerPage, page * rowsPerPage + rowsPerPage),
         [order, orderBy, page, rowsPerPage]
     )
 
     return (
-        <Box sx={{ width: '100%' }}>
+        <Box sx={{ width: '100%', padding: 5 }}>
             <Paper sx={{ width: '100%', mb: 2 }}>
                 <EnhancedTableToolbar
                     numSelected={selectedId === -1 ? 0 : 1}
@@ -291,7 +278,7 @@ export default function UserStocksTable() {
                     <Table
                         sx={{ minWidth: 750 }}
                         aria-labelledby="tableTitle"
-                        size={dense ? 'small' : 'medium'}
+                        size={'medium'}
                     >
                         <EnhancedTableHead
                             order={order}
@@ -355,7 +342,7 @@ export default function UserStocksTable() {
                 <TablePagination
                     rowsPerPageOptions={[5, 10, 25]}
                     component="div"
-                    count={rows.length}
+                    count={userStocksState.length}
                     rowsPerPage={rowsPerPage}
                     page={page}
                     onPageChange={handleChangePage}
