@@ -230,7 +230,7 @@ export default function UserStocksTable() {
 
     const handleClick = (event: React.MouseEvent<unknown>, id: number) => {
         const selectedRow = userStocksState.find((row) => row.id === id)
-        setSelectedSymbol(selectedRow!.ticker)
+        setSelectedSymbol(selectedRow ? selectedRow.ticker : '')
         if (id === selectedId) {
             setSelectedId(-1)
         } else {
