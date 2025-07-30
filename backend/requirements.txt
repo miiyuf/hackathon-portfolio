@@ -5,3 +5,5 @@ uvicorn[standard]
 flask
 pydantic
 yfinance
+
+apscheduler
