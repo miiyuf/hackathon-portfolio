@@ -44,3 +44,7 @@
 .internal-tab {
     margin-left: 240px;
 }
+
+.home-tab {
+    display: flex;
+}
