@@ -1,13 +1,13 @@
 # Database Schema
 
 ## Table: `stocks`
-| Field      | Type               | Null | Key | Default | Extra          |
-|------------|--------------------|------|-----|---------|----------------|
-| id         | int                | NO   | PRI | NULL    | auto_increment |
-| symbol     | varchar(10)        | NO   | MUL | NULL    |                |
-| cost_price | decimal(10,2)      | NO   |     | NULL    |                |
-| action     | enum('buy','sell') | NO   |     | NULL    |                |
-| quantity   | int                | NO   |     | 1       |                |
+| Field          | Type               | Null | Key | Default | Extra          |
+|----------------|--------------------|------|-----|---------|----------------|
+| id             | int                | NO   | PRI | NULL    | auto_increment |
+| symbol         | varchar(10)        | NO   | MUL | NULL    |                |
+| purchase_price | decimal(10,2)      | NO   |     | NULL    |                |
+| action         | enum('buy','sell') | NO   |     | NULL    |                |
+| quantity       | int                | NO   |     | 1       |                |
 
 ## Table: `stock_master`
 | Field  | Type         | Null | Key | Default | Extra |
