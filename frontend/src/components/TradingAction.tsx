@@ -11,35 +11,30 @@ import {
     Typography,
     type SelectChangeEvent,
 } from '@mui/material'
+import { useGlobalContext } from '../GlobalContext'
 
-interface TradingActionProps {
-    tradingActionModalOpen: boolean
-    setTradingActionModalOpen: (open: boolean) => void
-    selectedSymbol?: string
-    setSelectedSymbol: (symbol: string) => void
-}
-function TradingAction(props: TradingActionProps) {
-    const {
-        tradingActionModalOpen,
-        setTradingActionModalOpen,
-        selectedSymbol,
-        setSelectedSymbol,
-    } = props
+function TradingAction() {
+    const { tradingModalState, tradingModalDispatch } = useGlobalContext()
+
     const handleOpen = () => {
-        setSelectedSymbol('')
-        setTradingActionModalOpen(true)
+        tradingModalDispatch({
+            type: 'OPEN_MODAL_WITH_DATA',
+            state: { isOpen: true, symbol: '' },
+        })
     }
     const handleClose = () => {
-        setTradingActionModalOpen(false)
+        tradingModalDispatch({
+            type: 'CLOSE_MODAL',
+        })
     }
     const [action, setAction] = useState('')
 
     const handleChange = (event: SelectChangeEvent) => {
         setAction(event.target.value as string)
     }
-    const [symbol, setSymbol] = useState('')
     const [quantity, setQuantity] = useState('')
     const [currentPrice, setCurrentPrice] = useState(10)
+
     return (
         <div>
             <Button
@@ -59,7 +54,7 @@ function TradingAction(props: TradingActionProps) {
             >
                 Buy / Sell
             </Button>
-            <Modal open={tradingActionModalOpen} onClose={handleClose}>
+            <Modal open={tradingModalState.isOpen} onClose={handleClose}>
                 <Box
                     sx={{
                         width: 400,
@@ -88,8 +83,16 @@ function TradingAction(props: TradingActionProps) {
                             required
                             label="Stock Symbol"
                             placeholder="ex: AAPL"
-                            onChange={(e) => setSymbol(e.target.value)}
-                            value={selectedSymbol ? selectedSymbol : symbol}
+                            onChange={(e) =>
+                                tradingModalDispatch({
+                                    type: 'UPDATE_MODAL_SYMBOL',
+                                    state: {
+                                        isOpen: true,
+                                        symbol: e.target.value,
+                                    },
+                                })
+                            }
+                            value={tradingModalState.symbol}
                         ></TextField>
                         <TextField
                             required
