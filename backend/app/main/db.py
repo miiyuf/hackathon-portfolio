@@ -1,6 +1,10 @@
 import os
+import logging
 import mysql.connector
 from mysql.connector import Error
+
+logging.basicConfig(level=logging.INFO)
+logger = logging.getLogger(__name__)
 
 def get_db_connection():
     """
@@ -8,14 +12,31 @@ def get_db_connection():
     Returns:
         A MySQL connection object if successful, or None if the connection fails.
     """
+    db_host = os.getenv('DB_HOST')
+    db_user = os.getenv('DB_USER')
+    db_password = os.getenv('DB_PASSWORD')
+    db_name = os.getenv('DB_NAME')
+
+    if not all([db_host, db_user, db_password, db_name]):
+        logger.error("Missing required environment variables for database connection")
+        return None
+
+    logger.info(f"Connecting to DB with host={db_host}, user={db_user}, db={db_name}")
+    
     try:
         connection = mysql.connector.connect(
-            host=os.getenv('DB_HOST'),
-            user=os.getenv('DB_USER'),
-            password=os.getenv('DB_PASSWORD'),
-            database=os.getenv('DB_NAME')
+            host=db_host,
+            user=db_user,
+            password=db_password,
+            database=db_name
         )
-        return connection
+        
+        if connection.is_connected():
+            logger.info("MySQL connection established successfully")
+            return connection
+        else:
+            logger.error("MySQL connection failed without exception")
+            return None
     except Error as e:
-        print(f"MySQL connection error: {e}")
+        logger.error(f"MySQL connection error: {e}")
         return None
