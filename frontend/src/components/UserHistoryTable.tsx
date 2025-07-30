@@ -48,7 +48,6 @@ function UserHistoryTable() {
             label: 'Purchase Price ($)',
             minWidth: 100,
             align: 'right',
-            format: (value: number) => value.toLocaleString('en-US'),
         },
         {
             id: 'totalAmount',
@@ -62,7 +61,6 @@ function UserHistoryTable() {
             label: 'Date',
             minWidth: 100,
             align: 'left',
-            format: (value: number) => value.toFixed(2),
         },
     ]
 
@@ -314,7 +312,7 @@ function UserHistoryTable() {
                                         {columns.map((column) => {
                                             const value = row[column.id]
                                             if (
-                                                row.action == 'Buy' &&
+                                                row.action === 'Buy' &&
                                                 column.id === 'totalAmount'
                                             ) {
                                                 return (

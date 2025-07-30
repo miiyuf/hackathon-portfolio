@@ -1,7 +1,7 @@
 import React from 'react'
 
 function Trade() {
-    return <div style={{ marginLeft: 240 }}>DISPLAY STOCKS HERE</div>
+    return <div className="internal-tab">DISPLAY STOCKS HERE</div>
 }
 
 export default Trade

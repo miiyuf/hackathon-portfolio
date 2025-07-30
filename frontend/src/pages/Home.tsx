@@ -1,5 +1,7 @@
 import React from 'react'
 import UserStocksTable from '../components/UserStocksTable'
+import './Home.css'
+
 interface HomeProps {
     handleTradingAction: (open: boolean) => void
     handleSymbolSelect: (symbol: string) => void
@@ -7,7 +9,7 @@ interface HomeProps {
 function Home(props: HomeProps) {
     const { handleTradingAction, handleSymbolSelect } = props
     return (
-        <div style={{ display: 'flex', marginLeft: 240 }}>
+        <div className="internal-tab">
             <UserStocksTable
                 handleTradingAction={handleTradingAction}
                 handleSymbolSelect={handleSymbolSelect}
