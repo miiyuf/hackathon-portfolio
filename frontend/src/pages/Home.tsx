@@ -1,9 +1,10 @@
 import React from 'react'
 import UserStocksTable from '../components/UserStocksTable'
+import './Home.css'
 
 function Home() {
     return (
-        <div style={{ display: 'flex', marginLeft: 240 }}>
+        <div className="internal-tab">
             <UserStocksTable />
         </div>
     )

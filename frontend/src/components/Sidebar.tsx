@@ -12,6 +12,7 @@ import {
 } from '@mui/material'
 import SpaceDashboardIcon from '@mui/icons-material/SpaceDashboard'
 import AutoGraphIcon from '@mui/icons-material/AutoGraph'
+import HistoryIcon from '@mui/icons-material/History'
 import { useNavigate } from 'react-router-dom'
 
 function Sidebar() {
@@ -60,6 +61,18 @@ function Sidebar() {
                             <AutoGraphIcon />
                         </ListItemIcon>
                         <ListItemText primary={'Trade'} />
+                    </ListItemButton>
+                </ListItem>
+                <ListItem
+                    key={'history'}
+                    disablePadding
+                    onClick={() => navigate('/history')}
+                >
+                    <ListItemButton>
+                        <ListItemIcon>
+                            <HistoryIcon />
+                        </ListItemIcon>
+                        <ListItemText primary={'History'} />
                     </ListItemButton>
                 </ListItem>
             </List>
