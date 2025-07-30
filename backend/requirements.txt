@@ -2,7 +2,6 @@ flask
 python-dotenv
 mysql-connector-python
 uvicorn[standard]
-fastapi
+flask
 pydantic
 yfinance
-   
