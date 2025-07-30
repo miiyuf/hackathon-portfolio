@@ -24,7 +24,7 @@ const GlobalContext = createContext<TradingModalContextType>(
     initTradingModalContext
 )
 
-export function GlobalProvider({ children }: any) {
+export function GlobalProvider({ children }: { children: React.ReactNode }) {
     const [tradingModalState, tradingModalDispatch] = useReducer(
         tradingModalReducer,
         initTradingModalState

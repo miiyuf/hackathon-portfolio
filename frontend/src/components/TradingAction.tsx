@@ -13,11 +13,7 @@ import {
 } from '@mui/material'
 import { useGlobalContext } from '../GlobalContext'
 
-interface TradingActionProps {
-    selectedSymbol?: string
-}
-function TradingAction(props: TradingActionProps) {
-    const { selectedSymbol } = props
+function TradingAction() {
     const { tradingModalState, tradingModalDispatch } = useGlobalContext()
 
     const handleOpen = () => {
@@ -96,11 +92,7 @@ function TradingAction(props: TradingActionProps) {
                                     },
                                 })
                             }
-                            value={
-                                selectedSymbol
-                                    ? selectedSymbol
-                                    : tradingModalState.symbol
-                            }
+                            value={tradingModalState.symbol}
                         ></TextField>
                         <TextField
                             required
