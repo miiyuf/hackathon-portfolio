@@ -10,7 +10,7 @@ from app.main.services.transaction import transaction_bp
 from app.main.services.insert_stocks import stockinsert_bp
 from app.main.services.get_stock import stockget_bp
 from app.main.services.portfolio import portfolio_bp
-from app.main.services.portfolio_loss import portfolioloss_bp
+from app.main.services.profit_loss import profitloss_bp
 
 # 
 from app.main.bussinesslogic.calc_portfolio import update_current_prices
@@ -27,7 +27,7 @@ app.register_blueprint(holdings_bp)
 app.register_blueprint(transaction_bp)
 app.register_blueprint(price_bp)
 app.register_blueprint(portfolio_bp)
-app.register_blueprint(portfolioloss_bp)
+app.register_blueprint(profitloss_bp)
 
 # background scheduler to update current prices every 5 minutes
 scheduler = BackgroundScheduler()
