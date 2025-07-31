@@ -1,33 +1,31 @@
 import React from 'react'
 import { LineChart, lineElementClasses } from '@mui/x-charts/LineChart'
-const uData = [1000, 2000, 1800, 1000, 3000, 1590, 5000]
-const xLabels = [
-    'Page A',
-    'Page B',
-    'Page C',
-    'Page D',
-    'Page E',
-    'Page F',
-    'Page G',
-]
-function LineGraph() {
+const uData = [1000, 2800, 1050, 1890, 1505, 3800]
+const xLabels = ['Jul 1', 'Jul 7', 'Jul 14', 'Jul 21', 'Jul 28', 'Today']
+
+interface LineGraphProps {
+    selectedUserStock: string
+}
+function LineGraph(props: LineGraphProps) {
+    const { selectedUserStock } = props
     return (
         <div>
             <LineChart
                 height={300}
-                width={700}
+                width={650}
                 series={[
                     {
                         data: uData,
-                        label: 'balance',
+                        label: `${selectedUserStock}`,
                         area: true,
                         showMark: false,
+                        color: 'rgba(28, 144, 30, 0.5)',
                     },
                 ]}
                 xAxis={[{ scaleType: 'point', data: xLabels }]}
                 sx={{
-                    [`& .${lineElementClasses.root}`]: {
-                        display: 'none',
+                    '.MuiAreaElement-root': {
+                        fill: 'rgba(101, 199, 103, 0.5)',
                     },
                 }}
             />

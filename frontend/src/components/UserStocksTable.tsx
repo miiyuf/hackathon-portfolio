@@ -1,5 +1,5 @@
 import * as React from 'react'
-import { useState, useEffect } from 'react'
+import { useState, useEffect, type Dispatch, type SetStateAction } from 'react'
 import { alpha } from '@mui/material/styles'
 import { useTradingContext } from '../GlobalContext'
 import {
@@ -201,7 +201,11 @@ function EnhancedTableToolbar(props: EnhancedTableToolbarProps) {
     )
 }
 
-export default function UserStocksTable() {
+interface UserStocksTableProps {
+    handleStockSelection: Dispatch<SetStateAction<string>>
+}
+export default function UserStocksTable(props: UserStocksTableProps) {
+    const { handleStockSelection } = props
     const [order, setOrder] = React.useState<Order>('asc')
     const [orderBy, setOrderBy] = React.useState<keyof StockData>('ticker')
     const [selectedId, setSelectedId] = useState(-1)
@@ -231,6 +235,7 @@ export default function UserStocksTable() {
     const handleClick = (event: React.MouseEvent<unknown>, id: number) => {
         const selectedRow = userStocksState.find((row) => row.id === id)
         setSelectedSymbol(selectedRow ? selectedRow.ticker : '')
+        handleStockSelection(selectedRow ? selectedRow.ticker : '')
         if (id === selectedId) {
             setSelectedId(-1)
         } else {
@@ -268,7 +273,7 @@ export default function UserStocksTable() {
     )
 
     return (
-        <Box sx={{ width: '100%', padding: 5 }}>
+        <Box sx={{ width: '100%', paddingTop: 3 }}>
             <Paper sx={{ width: '100%', mb: 2 }}>
                 <EnhancedTableToolbar
                     numSelected={selectedId === -1 ? 0 : 1}
