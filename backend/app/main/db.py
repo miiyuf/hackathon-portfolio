@@ -13,9 +13,9 @@ def get_db_connection():
         A MySQL connection object if successful, or None if the connection fails.
     """
     db_host = os.getenv('DB_HOST')
-    db_user = os.getenv('DB_USER')
-    db_password = os.getenv('DB_PASSWORD')
-    db_name = os.getenv('DB_NAME')
+    db_user = os.getenv('MYSQL_USER')
+    db_password = os.getenv('MYSQL_PASSWORD')
+    db_name = os.getenv('MYSQL_DATABASE')
 
     if not all([db_host, db_user, db_password, db_name]):
         logger.error("Missing required environment variables for database connection")
