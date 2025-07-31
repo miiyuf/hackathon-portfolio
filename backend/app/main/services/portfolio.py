@@ -16,8 +16,8 @@ def get_portfolio():
     for holding in holdings:
         symbol = holding['symbol']
         current_price = get_real_price(symbol)
-        current_price = Decimal(str(current_price))
         if current_price is not None:
+            current_price = Decimal(str(current_price))
             holding['current_price'] = current_price
             holding['total_value'] = current_price * holding['total_quantity']
         else:
