@@ -1,14 +1,23 @@
-import React, { useEffect, useState } from 'react'
+import React, {
+    useEffect,
+    useState,
+    type Dispatch,
+    type SetStateAction,
+} from 'react'
 import { PieChart as MuiPieChart } from '@mui/x-charts'
 import { useUserStocksContext } from '../GlobalContext'
-import { Tooltip } from '@mui/material'
 import { ToggleButtonGroup, ToggleButton } from '@mui/material'
+
 interface pieChartData {
     id: number
     value: number
     label: string
 }
-function PieChart() {
+interface PieChartProps {
+    handleStockSelection: Dispatch<SetStateAction<string>>
+}
+function PieChart(props: PieChartProps) {
+    const { handleStockSelection } = props
     const { userStocksState } = useUserStocksContext()
     const [totalStocksValue, setTotalStocksValue] = useState(1)
     const [pieChartView, setPieChartView] = useState('individualHoldings')
@@ -88,6 +97,10 @@ function PieChart() {
                             `${((value.value / totalStocksValue) * 100).toFixed(2)}%`,
                     },
                 ]}
+                onItemClick={(e, d) => {
+                    let index = d.dataIndex
+                    handleStockSelection(pieChartData[index].label)
+                }}
                 width={200}
                 height={300}
             />
@@ -96,12 +109,15 @@ function PieChart() {
                 exclusive
                 onChange={handlePieChartView}
                 aria-label="pie chart view options"
+                sx={{
+                    height: 30,
+                }}
             >
                 <ToggleButton
                     value="individualHoldings"
                     aria-label="right aligned"
                 >
-                    individual holdings
+                    company
                 </ToggleButton>
                 <ToggleButton value="country" aria-label="left aligned">
                     country
