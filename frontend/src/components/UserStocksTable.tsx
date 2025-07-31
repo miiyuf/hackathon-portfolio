@@ -207,7 +207,7 @@ export default function UserStocksTable() {
     const [selectedId, setSelectedId] = useState(-1)
     const [page, setPage] = React.useState(0)
     const [dense, setDense] = React.useState(false)
-    const [rowsPerPage, setRowsPerPage] = React.useState(5)
+    const [rowsPerPage, setRowsPerPage] = React.useState(3)
     const [selectedSymbol, setSelectedSymbol] = useState('')
     const { userStocksState, userStocksDispatch } = useUserStocksContext()
 
@@ -340,7 +340,7 @@ export default function UserStocksTable() {
                     </Table>
                 </TableContainer>
                 <TablePagination
-                    rowsPerPageOptions={[5, 10, 25]}
+                    rowsPerPageOptions={[3, 5, 10, 25]}
                     component="div"
                     count={userStocksState.length}
                     rowsPerPage={rowsPerPage}
