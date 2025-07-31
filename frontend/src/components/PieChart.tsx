@@ -95,7 +95,7 @@ function PieChart() {
                 value={pieChartView}
                 exclusive
                 onChange={handlePieChartView}
-                aria-label="text alignment"
+                aria-label="pie chart view options"
             >
                 <ToggleButton
                     value="individualHoldings"
