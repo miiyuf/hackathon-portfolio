@@ -16,11 +16,12 @@ def get_holdings():
 
     cursor = conn.cursor(dictionary=True)
     query = """
-        SELECT symbol, name, 
-            SUM(CASE WHEN action = 'buy' THEN quantity ELSE -quantity END) AS total_quantity
-        FROM stocks
-        GROUP BY symbol, name
-        HAVING total_quantity > 0;
+    SELECT s.symbol, sm.name,
+        SUM(CASE WHEN s.action = 'buy' THEN s.quantity ELSE -s.quantity END) AS total_quantity
+    FROM stocks s
+    LEFT JOIN stock_master sm ON s.symbol = sm.symbol
+    GROUP BY s.symbol, sm.name
+    HAVING total_quantity > 0;
     """
     cursor.execute(query)
     results = cursor.fetchall()

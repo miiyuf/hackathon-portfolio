@@ -1,5 +1,6 @@
 from app.main.bussinesslogic.calc_portfolio import fetch_holdings, get_real_price
 from flask import Blueprint, request, jsonify
+from decimal import Decimal, InvalidOperation
 
 portfolio_bp = Blueprint('portfolio', __name__, url_prefix='/api')
 
@@ -16,6 +17,7 @@ def get_portfolio():
         symbol = holding['symbol']
         current_price = get_real_price(symbol)
         if current_price is not None:
+            current_price = Decimal(str(current_price))
             holding['current_price'] = current_price
             holding['total_value'] = current_price * holding['total_quantity']
         else:
