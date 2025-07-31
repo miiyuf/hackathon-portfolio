@@ -276,7 +276,7 @@ export default function UserStocksTable() {
                 />
                 <TableContainer>
                     <Table
-                        sx={{ minWidth: 750 }}
+                        sx={{ minWidth: 700 }}
                         aria-labelledby="tableTitle"
                         size={'medium'}
                     >
