@@ -30,8 +30,8 @@ def get_profit_loss():
                 logger.error(f"Error calculating profit/loss for {symbol}: {e}")
                 
                 profit_loss = None
-            holding['current_price'] = Decimal(str(current_price))
-            holding['profit_loss'] = Decimal(str(profit_loss)) if profit_loss is not None else None
+                holding['current_price'] = Decimal(str(current_price))
+                holding['profit_loss'] = Decimal(str(profit_loss)) if profit_loss is not None else None
         else:
             logger.warning(f"Current price not found for {symbol}")
             holding['current_price'] = None
