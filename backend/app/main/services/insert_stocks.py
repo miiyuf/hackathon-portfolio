@@ -57,5 +57,4 @@ def insert_stock():
     finally:
         if cursor:
             cursor.close()
-        if conn:
-            conn.close()
+        conn.close()
