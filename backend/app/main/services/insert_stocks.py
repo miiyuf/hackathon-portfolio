@@ -35,7 +35,6 @@ def insert_stock():
     if isinstance(conn, tuple):
         return conn
     
-    cursor = None
     try:
         cursor = conn.cursor()
         query = """
