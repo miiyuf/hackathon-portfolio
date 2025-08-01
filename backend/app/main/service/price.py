@@ -1,4 +1,4 @@
-from app.main.bussinesslogic.calc_portfolio import get_real_price
+from app.main.businesslogic.calc_portfolio import get_real_price
 from flask import Blueprint, request, jsonify
 
 def get_stock_price(symbol):
