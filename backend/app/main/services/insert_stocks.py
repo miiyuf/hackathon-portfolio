@@ -82,7 +82,7 @@ def insert_stock_symbol_pair(ticker, name):
         conn.commit()
         return jsonify({"message": "Stock Master table updated successfully"}), 201
     except Error as e:
-        return e
+        return jsonify({"error": "Failed to update Stock Master table", "details": str(e)}), 500
     finally:
         cursor.close()
         conn.close()
