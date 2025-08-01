@@ -19,7 +19,7 @@ def get_real_price(symbol):
         price = stock.history(period="1d")["Close"].iloc[-1]
         return price
     except Exception as e:
-        print(f"Error fetching price for {symbol}: {e}")
+        logger.error(f"Error fetching price for {symbol}: {e}")
         return None
     
 
