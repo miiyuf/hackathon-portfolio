@@ -69,6 +69,6 @@ def get_portfolio():
     result = portfolio.get_portfolio()
     if not result:
         return jsonify({"error": "No portfolio data found"}), 404
-    return result
+    return jsonify(result)
 
 

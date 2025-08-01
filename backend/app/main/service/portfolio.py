@@ -1,4 +1,4 @@
-from app.main.bussinesslogic.calc_portfolio import fetch_holdings, get_real_price
+from app.main.businesslogic.calc_portfolio import fetch_holdings, get_real_price
 from flask import Blueprint, request, jsonify
 from decimal import Decimal, InvalidOperation
 

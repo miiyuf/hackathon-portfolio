@@ -1,6 +1,6 @@
 
 from flask import Blueprint, request, jsonify
-from app.main.bussinesslogic.calc_portfolio import get_real_price, fetch_holdings
+from app.main.businesslogic.calc_portfolio import get_real_price, fetch_holdings
 import logging
 from decimal import Decimal, InvalidOperation
 
@@ -31,7 +31,7 @@ def get_profit_loss():
                 
                 profit_loss = None
                 holding['current_price'] = Decimal(str(current_price))
-                holding['profit_loss'] = Decimal(str(profit_loss)) if profit_loss is not None else None
+                holding['profit_loss'] = None
         else:
             logger.warning(f"Current price not found for {symbol}")
             holding['current_price'] = None

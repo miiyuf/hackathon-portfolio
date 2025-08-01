@@ -1,6 +1,6 @@
 import pytest
 from unittest.mock import patch
-from main import app  
+from main import app
 from app.main.service.price import get_stock_price
 
 def test_get_price_success():
