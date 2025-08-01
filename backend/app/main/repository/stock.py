@@ -1,6 +1,7 @@
 from app.main.db import get_db_connection
 from flask import Blueprint, request, jsonify
 from mysql.connector import Error
+import yfinance as yf
 import logging
 
 logging.basicConfig(level=logging.INFO)
@@ -75,13 +76,45 @@ def insert_stock(data):
         )
         cursor.execute(query, values)
         conn.commit()
+        name = get_stock_name_from_ticker(data['symbol'])
+        if not name:
+            raise ValueError(f"Could not retrieve name for {data['symbol']}")
+        insert_stock_symbol_pair(data['symbol'], name)
         return jsonify({"message": "Stock inserted successfully"}), 201
     except Error as e:
         logger.error(f"Error inserting stock: {e}")
         return jsonify({"error": str(e)}), 500
     finally:
-        if cursor:
-            cursor.close()
+        cursor.close()
+        conn.close()
+   
+def insert_stock_symbol_pair(ticker, name):
+    conn = get_db_connection()
+    if isinstance(conn, tuple):
+        return conn
+    try:
+        cursor = conn.cursor()
+        query = """
+            INSERT INTO stock_master (symbol, name)
+            VALUES (%s, %s)
+        """
+        values = (
+            ticker, name
+        )
+        cursor.execute(query, values)
+        conn.commit()
+        return jsonify({"message": "Stock Master table updated successfully"}), 201
+    except Error as e:
+        return jsonify({"error": "Failed to update Stock Master table", "details": str(e)}), 500
+    finally:
+        cursor.close()
         conn.close()
     
 
+def get_stock_name_from_ticker(ticker):
+    try:
+        stock = yf.Ticker(ticker)
+        info = stock.info
+        return info.get("shortName", None)
+    except Exception as e:
+        return e
