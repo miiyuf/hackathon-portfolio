@@ -29,7 +29,7 @@ export const getUserStocks = () =>
             return userStocks
         })
         .catch(function (error) {
-            console.log(error)
+            console.log('Failed to fetch user stocks:', error)
         })
         .finally(function () {
             console.log('end of get user stocks')
