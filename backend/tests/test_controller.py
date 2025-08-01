@@ -2,7 +2,7 @@ import pytest
 from unittest.mock import patch
 from main import app
 
-@patch("app.main.bussinesslogic.calc_portfolio.get_real_price")
+@patch("app.main.businesslogic.calc_portfolio.get_real_price")
 def test_get_price_success(mock_get_real_price):
     mock_get_real_price.return_value = 123.45
 
