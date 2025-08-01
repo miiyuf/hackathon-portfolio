@@ -13,11 +13,12 @@ def get_holdings():
         return jsonify({"error": "DB connection failed"}), 500
 
     cursor = conn.cursor(dictionary=True)
-    query = """
-    SELECT s.symbol, sm.name,
-        SUM(CASE WHEN s.action = 'buy' THEN s.quantity ELSE -s.quantity END) AS total_quantity
-    FROM stocks s
-    LEFT JOIN stock_master sm ON s.symbol = sm.symbol
+    query="""
+    SELECT s.symbol, sm.name, 
+        SUM(CASE WHEN s.action = 'buy' THEN s.quantity ELSE -s.quantity END) AS total_quantity, 
+        avg(CASE WHEN s.action='buy' THEN s.purchase_price ELSE NULL END) as cost_price 
+    FROM stocks s 
+    LEFT JOIN stock_master sm ON s.symbol = sm.symbol 
     GROUP BY s.symbol, sm.name
     HAVING total_quantity > 0;
     """

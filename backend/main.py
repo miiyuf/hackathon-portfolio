@@ -5,14 +5,14 @@ import atexit
 from flask_cors import CORS
 
 # Blueprint imports
-# from app.main.controller.routes import stockget_bp, stockinsert_bp, holdings_bp, transaction_bp, price_bp, portfolio_bp, profitloss_bp
-from app.main.services.price import price_bp
-from app.main.services.holding import holdings_bp
-from app.main.services.transaction import transaction_bp
-from app.main.services.insert_stocks import stockinsert_bp
-from app.main.services.get_stock import stockget_bp
-from app.main.services.portfolio import portfolio_bp
-from app.main.services.profit_loss import profitloss_bp
+from app.main.controller.routes import stockget_bp, stockinsert_bp, holdings_bp, transaction_bp, price_bp, portfolio_bp, profitloss_bp
+# from app.main.services.price import price_bp
+# from app.main.services.holding import holdings_bp
+# from app.main.services.transaction import transaction_bp
+# from app.main.services.insert_stocks import stockinsert_bp
+# from app.main.services.get_stock import stockget_bp
+# from app.main.services.portfolio import portfolio_bp
+# from app.main.services.profit_loss import profitloss_bp
 
 # 
 from app.main.bussinesslogic.calc_portfolio import update_current_prices
