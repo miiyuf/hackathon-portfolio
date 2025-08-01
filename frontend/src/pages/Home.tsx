@@ -13,7 +13,7 @@ import {
 function Home() {
     const [selectedUserStock, setSelectedUserStock] = useState('AAPL')
 
-    // // TEST CODE TO CHECK ENDPOINTS
+    // TEST CODE TO CHECK ENDPOINTS
     // useEffect(() => {
     //     const testFetch = async () => {
     //         try {
@@ -56,7 +56,7 @@ function Home() {
     //     // }
     //     testFetch()
     //     // testAddStock()
-    //     testTransactions()
+    //     // testTransactions()
     // }, [])
 
     return (
