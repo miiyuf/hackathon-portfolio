@@ -3,6 +3,7 @@ from dotenv import load_dotenv
 from apscheduler.schedulers.background import BackgroundScheduler
 import atexit
 from flask_cors import CORS
+
 # Blueprint imports
 # from app.main.controller.routes import stockget_bp, stockinsert_bp, holdings_bp, transaction_bp, price_bp, portfolio_bp, profitloss_bp
 from app.main.services.price import price_bp
@@ -21,6 +22,7 @@ load_dotenv()
 
 app = Flask(__name__)
 CORS(app, origins="http://localhost:5173")
+
 
 # Register blueprints for stock and trade routes
 app.register_blueprint(stockinsert_bp)

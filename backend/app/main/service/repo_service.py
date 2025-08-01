@@ -8,5 +8,6 @@ def get_holdings():
 
 def insert_stock(data):
     return stock.insert_stock(data)
+
 def get_transactions():
     return transaction.get_transactions()
