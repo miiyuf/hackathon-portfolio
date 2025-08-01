@@ -1,6 +1,10 @@
 from app.main.db import get_db_connection
 from flask import Blueprint, request, jsonify
 from mysql.connector import Error
+import logging
+
+logging.basicConfig(level=logging.INFO)
+logger = logging.getLogger(__name__)
 
 def get_stocks():
     """
