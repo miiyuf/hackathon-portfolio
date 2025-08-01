@@ -110,15 +110,15 @@ def update_current_prices():
         symbol = record['symbol']
         current_price = get_real_price(symbol)
         if current_price is None:
-            print(f"Failed to fetch price for {symbol}.")
+            logger.warning(f"Failed to fetch price for {symbol}.")
             continue
         try:
             update_query = "UPDATE stocks SET current_price = %s WHERE symbol = %s;"
             cursor.execute(update_query, (current_price, symbol))
             conn.commit()
-            print(f"Updated price for {symbol}: {current_price}")
+            logger.info(f"Updated price for {symbol}: {current_price}")
         except Error as e:
-            print(f"Error updating price for {symbol}: {e}")
+            logger.error(f"Error updating price for {symbol}: {e}")
 
     cursor.close()
     conn.close()
