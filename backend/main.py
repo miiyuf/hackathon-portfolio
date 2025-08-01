@@ -4,6 +4,7 @@ from apscheduler.schedulers.background import BackgroundScheduler
 import atexit
 from flask_cors import CORS
 # Blueprint imports
+# from app.main.controller.routes import stockget_bp, stockinsert_bp, holdings_bp, transaction_bp, price_bp, portfolio_bp, profitloss_bp
 from app.main.services.price import price_bp
 from app.main.services.holding import holdings_bp
 from app.main.services.transaction import transaction_bp
