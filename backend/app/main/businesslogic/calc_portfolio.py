@@ -99,7 +99,7 @@ def update_current_prices():
     """
     conn = get_db_connection()
     if isinstance(conn, tuple):
-        print("Database connection failed.")
+        logger.error("Database connection failed.")
         return
 
     cursor = conn.cursor(dictionary=True)
