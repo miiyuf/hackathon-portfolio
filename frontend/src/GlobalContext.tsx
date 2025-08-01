@@ -48,7 +48,7 @@ function tradingModalReducer(
     }
 }
 
-interface UserStockState {
+export interface UserStockState {
     id: number
     ticker: string
     stockName: string
