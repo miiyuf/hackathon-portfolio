@@ -6,11 +6,11 @@ const API = axios.create({
 
 export interface PortfolioData {
     symbol: string
-    name?: string
+    name: string
     total_quantity: number
     purchase_price: number
-    current_price?: number
-    profit_loss?: number
+    current_price: number
+    profit_loss: number
 }
 
 export const fetchPortfolioData = async (): Promise<PortfolioData[]> => {

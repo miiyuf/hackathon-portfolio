@@ -19,17 +19,11 @@ import {
     IconButton,
     Tooltip,
     Button,
+    Skeleton,
 } from '@mui/material'
 import { visuallyHidden } from '@mui/utils'
 import { useUserStocksContext } from '../GlobalContext'
-
-interface StockData {
-    id: number
-    ticker: string
-    stockName: string
-    qty: number
-    costPrice: number
-}
+import { type UserStockState } from '../GlobalContext'
 
 function descendingComparator<T>(a: T, b: T, orderBy: keyof T) {
     if (b[orderBy] < a[orderBy]) {
@@ -57,7 +51,7 @@ function getComparator<Key extends keyof any>(
 
 interface HeadCell {
     disablePadding: boolean
-    id: keyof StockData
+    id: keyof UserStockState
     label: string
     numeric: boolean
 }
@@ -87,12 +81,24 @@ const headCells: readonly HeadCell[] = [
         disablePadding: false,
         label: 'Cost Price ($)',
     },
+    {
+        id: 'currentPrice',
+        numeric: true,
+        disablePadding: false,
+        label: 'Current Price ($)',
+    },
+    {
+        id: 'profitLoss',
+        numeric: true,
+        disablePadding: false,
+        label: 'Profit / Loss ($)',
+    },
 ]
 
 interface EnhancedTableProps {
     onRequestSort: (
         event: React.MouseEvent<unknown>,
-        property: keyof StockData
+        property: keyof UserStockState
     ) => void
     order: Order
     orderBy: string
@@ -101,14 +107,14 @@ interface EnhancedTableProps {
 function EnhancedTableHead(props: EnhancedTableProps) {
     const { order, orderBy, onRequestSort } = props
     const createSortHandler =
-        (property: keyof StockData) => (event: React.MouseEvent<unknown>) => {
+        (property: keyof UserStockState) =>
+        (event: React.MouseEvent<unknown>) => {
             onRequestSort(event, property)
         }
 
     return (
         <TableHead>
             <TableRow>
-                <TableCell padding="checkbox"></TableCell>
                 {headCells.map((headCell) => (
                     <TableCell
                         key={headCell.id}
@@ -207,7 +213,7 @@ interface UserStocksTableProps {
 export default function UserStocksTable(props: UserStocksTableProps) {
     const { handleStockSelection } = props
     const [order, setOrder] = React.useState<Order>('asc')
-    const [orderBy, setOrderBy] = React.useState<keyof StockData>('ticker')
+    const [orderBy, setOrderBy] = React.useState<keyof UserStockState>('ticker')
     const [selectedId, setSelectedId] = useState(-1)
     const [page, setPage] = React.useState(0)
     const [dense, setDense] = React.useState(false)
@@ -225,7 +231,7 @@ export default function UserStocksTable(props: UserStocksTableProps) {
 
     const handleRequestSort = (
         event: React.MouseEvent<unknown>,
-        property: keyof StockData
+        property: keyof UserStockState
     ) => {
         const isAsc = orderBy === property && order === 'asc'
         setOrder(isAsc ? 'desc' : 'asc')
@@ -269,7 +275,7 @@ export default function UserStocksTable(props: UserStocksTableProps) {
             [...userStocksState]
                 .sort(getComparator(order, orderBy))
                 .slice(page * rowsPerPage, page * rowsPerPage + rowsPerPage),
-        [order, orderBy, page, rowsPerPage]
+        [order, orderBy, page, rowsPerPage, userStocksState]
     )
 
     return (
@@ -291,47 +297,72 @@ export default function UserStocksTable(props: UserStocksTableProps) {
                             onRequestSort={handleRequestSort}
                         />
                         <TableBody>
-                            {visibleRows.map((row, index) => {
-                                const labelId = `enhanced-table-checkbox-${index}`
+                            {visibleRows.length > 0
+                                ? visibleRows.map((row, index) => {
+                                      const labelId = `enhanced-table-checkbox-${index}`
 
-                                return (
-                                    <TableRow
-                                        hover
-                                        onClick={(event) =>
-                                            handleClick(event, row.id)
-                                        }
-                                        role="checkbox"
-                                        tabIndex={-1}
-                                        key={row.id}
-                                        selected={selectedId === row.id}
-                                        sx={{ cursor: 'pointer' }}
-                                    >
-                                        <TableCell padding="checkbox">
-                                            <Checkbox
-                                                color="primary"
-                                                checked={selectedId === row.id}
-                                            />
-                                        </TableCell>
-                                        <TableCell
-                                            component="th"
-                                            id={labelId}
-                                            scope="row"
-                                            align="left"
-                                        >
-                                            {row.ticker}
-                                        </TableCell>
-                                        <TableCell align="left">
-                                            {row.stockName}
-                                        </TableCell>
-                                        <TableCell align="right">
-                                            {row.qty}
-                                        </TableCell>
-                                        <TableCell align="right">
-                                            {row.costPrice}
-                                        </TableCell>
-                                    </TableRow>
-                                )
-                            })}
+                                      return (
+                                          <TableRow
+                                              hover
+                                              onClick={(event) =>
+                                                  handleClick(event, row.id)
+                                              }
+                                              role="checkbox"
+                                              tabIndex={-1}
+                                              key={row.id}
+                                              selected={selectedId === row.id}
+                                              sx={{ cursor: 'pointer' }}
+                                          >
+                                              <TableCell
+                                                  component="th"
+                                                  id={labelId}
+                                                  scope="row"
+                                                  align="left"
+                                              >
+                                                  {row.ticker}
+                                              </TableCell>
+                                              <TableCell align="left">
+                                                  {row.stockName}
+                                              </TableCell>
+                                              <TableCell align="right">
+                                                  {row.qty}
+                                              </TableCell>
+                                              <TableCell align="right">
+                                                  {row.costPrice}
+                                              </TableCell>
+                                              <TableCell align="right">
+                                                  {Number(
+                                                      row.currentPrice
+                                                  ).toFixed(2)}
+                                              </TableCell>
+                                              <TableCell align="right">
+                                                  {row.profitLoss}
+                                              </TableCell>
+                                          </TableRow>
+                                      )
+                                  })
+                                : Array.from(new Array(3)).map((_, index) => (
+                                      <TableRow key={index}>
+                                          <TableCell component="th">
+                                              <Skeleton />
+                                          </TableCell>
+                                          <TableCell align="left">
+                                              <Skeleton />
+                                          </TableCell>
+                                          <TableCell align="right">
+                                              <Skeleton />
+                                          </TableCell>
+                                          <TableCell align="right">
+                                              <Skeleton />
+                                          </TableCell>
+                                          <TableCell align="right">
+                                              <Skeleton />
+                                          </TableCell>
+                                          <TableCell align="right">
+                                              <Skeleton />
+                                          </TableCell>
+                                      </TableRow>
+                                  ))}
                             {emptyRows > 0 && (
                                 <TableRow
                                     style={{

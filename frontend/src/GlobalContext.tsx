@@ -1,6 +1,5 @@
 import { createContext, useReducer, useContext, useEffect } from 'react'
 import { fetchPortfolioData } from './api/stocks'
-import { PortfolioData } from './api/stocks'
 
 interface TradingModalState {
     isOpen: boolean
@@ -56,6 +55,8 @@ export interface UserStockState {
     stockName: string
     qty: number
     costPrice: number
+    currentPrice: number
+    profitLoss: number
 }
 
 interface UserStocksContextType {
@@ -119,6 +120,8 @@ export function GlobalProvider({ children }: { children: React.ReactNode }) {
                             stockName: holding.name || 'N/A',
                             qty: holding.total_quantity,
                             costPrice: holding.purchase_price,
+                            currentPrice: holding.current_price,
+                            profitLoss: holding.profit_loss,
                         }
                     }
                 )
