@@ -144,7 +144,7 @@ function TradingAction() {
                                     type: 'UPDATE_MODAL_SYMBOL',
                                     state: {
                                         isOpen: true,
-                                        symbol: e.target.value,
+                                        symbol: e.target.value.toUpperCase(),
                                     },
                                 })
                             }
