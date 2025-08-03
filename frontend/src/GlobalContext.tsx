@@ -131,7 +131,7 @@ export function GlobalProvider({ children }: { children: React.ReactNode }) {
             }
         }
         testFetch()
-    }, [])
+    }, [tradingModalState.isOpen])
 
     return (
         <TradingContext.Provider

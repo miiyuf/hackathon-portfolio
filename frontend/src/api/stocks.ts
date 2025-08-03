@@ -23,12 +23,16 @@ export const fetchPortfolioData = async (): Promise<PortfolioData[]> => {
     }
 }
 
-export const addStockTransaction = async (data: {
+export interface StockTransaction {
     symbol: string
     purchase_price: number
     action: 'buy' | 'sell'
     quantity: number
-}): Promise<any> => {
+}
+
+export const addStockTransaction = async (
+    data: StockTransaction
+): Promise<any> => {
     try {
         const response = await API.post(`/api/stocks`, data)
         return response.data

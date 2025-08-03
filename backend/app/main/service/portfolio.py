@@ -9,7 +9,7 @@ def get_portfolio():
     Returns:
         JSON response with the portfolio details or an error message if the DB connection fails.
     """
-    holdings = fetch_holdings()
+    holdings = fetch_holdings(True)
     portfolio = []
     for holding in holdings:
         symbol = holding['symbol']
