@@ -45,7 +45,6 @@ except (AttributeError, TypeError):
     
     app.json_encoder = DecimalJSONEncoder
 
-CORS(app, origins="http://localhost:5173")
 
 # Register blueprints for stock and trade routes
 app.register_blueprint(stockinsert_bp)
