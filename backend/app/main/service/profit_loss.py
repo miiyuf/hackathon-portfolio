@@ -1,6 +1,8 @@
 
 from flask import Blueprint, request, jsonify
-from app.main.businesslogic.calc_portfolio import get_real_price, fetch_holdings
+# from app.main.businesslogic.calc_portfolio import get_real_price, fetch_holdings
+from app.main.service.calc_portfolio import get_real_price
+from app.main.repository.fetchholding import fetch_holdings
 import logging
 from decimal import Decimal, InvalidOperation
 
