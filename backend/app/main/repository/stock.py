@@ -1,4 +1,4 @@
-from app.main.db import get_db_connection
+from app.main.database.db import get_db_connection
 from flask import Blueprint, request, jsonify
 from mysql.connector import Error
 import yfinance as yf
