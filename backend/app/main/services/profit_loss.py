@@ -13,12 +13,6 @@ if not logger.handlers:
     handler.setFormatter(logging.Formatter('%(asctime)s - %(name)s - %(levelname)s - %(message)s'))
     logger.addHandler(handler)
 
-class DecimalEncoder(json.JSONEncoder):
-    def default(self, obj):
-        if isinstance(obj, Decimal):
-            return float(obj)
-        return super(DecimalEncoder, self).default(obj)
-
 profitloss_bp = Blueprint('profit_loss', __name__, url_prefix='/api')
 
 @profitloss_bp.route('/profit_loss', methods=['GET'])
