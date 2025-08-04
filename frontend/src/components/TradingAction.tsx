@@ -47,10 +47,10 @@ function TradingAction() {
     // fetch current price once user clicks out of stock symbol field
     const displayCurrentPrice = async () => {
         try {
-            const currentPrice = await fetchCurrentPrice(
-                tradingModalState.symbol || ''
-            )
-            setCurrentPrice(currentPrice.toFixed(2))
+            const currentPrice = await getCurrentPrice()
+            if (currentPrice) {
+                setCurrentPrice(currentPrice.toFixed(2))
+            }
         } catch (error) {
             console.error('Error displaying current price:', error)
         }
@@ -70,14 +70,19 @@ function TradingAction() {
     const buyStock = async () => {
         try {
             const buyingPrice = await getCurrentPrice()
-            const newStock: StockTransaction = {
-                symbol: tradingModalState.symbol!,
-                purchase_price: buyingPrice!,
-                action: 'buy',
-                quantity: Number(quantity),
+            if (tradingModalState.symbol && buyingPrice) {
+                const newStock: StockTransaction = {
+                    symbol: tradingModalState.symbol!,
+                    purchase_price: buyingPrice!,
+                    action: 'buy',
+                    quantity: Number(quantity),
+                }
+                const res = await addStockTransaction(newStock)
+                console.log(res)
+            } else {
+                alert('Please enter all fields')
+                return
             }
-            const res = await addStockTransaction(newStock)
-            console.log(res)
         } catch (error) {
             console.log('Error buying stock: ', error)
         } finally {
@@ -163,7 +168,9 @@ function TradingAction() {
                         </Typography>
                         <Typography id="modal-modal-description" sx={{ mt: 2 }}>
                             estimated total price: $
-                            {Number(currentPrice) * parseInt(quantity || '0')}
+                            {(
+                                Number(currentPrice) * parseInt(quantity || '0')
+                            ).toFixed(2)}
                         </Typography>
                         <FormControl variant="standard">
                             <InputLabel id="action">Action</InputLabel>
