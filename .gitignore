@@ -3,6 +3,6 @@ backend/app/__pycache__/
 backend/.devcontainer/
 backend/.vscode/
 backend/__pycache__/
-backend/app/main/services/__pycache__/
+backend/app/main/service/__pycache__/
 backend/app/main/__pycache__/
-backend/app/main/bussinesslogic/__pycache__/
+backend/app/main/repository/__pycache__/

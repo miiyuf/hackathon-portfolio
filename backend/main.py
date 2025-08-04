@@ -23,7 +23,7 @@ from app.main.controller.routes import stockget_bp, stockinsert_bp, holdings_bp,
 # from app.main.services.profit_loss import profitloss_bp
 
 # 
-# from app.main.bussinesslogic.calc_portfolio import update_current_prices
+# from app.main.service.calc_portfolio import update_current_prices
 from app.main.service.repo_service import update_current_prices
 
 # Load .env file

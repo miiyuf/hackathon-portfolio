@@ -1,4 +1,4 @@
-from app.main.bussinesslogic.calc_portfolio import get_real_price
+from app.main.service.calc_portfolio import get_real_price
 from flask import Blueprint, request, jsonify
 
 price_bp = Blueprint('price', __name__, url_prefix='/api')
