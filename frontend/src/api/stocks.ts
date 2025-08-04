@@ -6,17 +6,16 @@ const API = axios.create({
 
 export interface PortfolioData {
     symbol: string
-    name?: string
+    name: string
     total_quantity: number
     purchase_price: number
-    current_price?: number
-    profit_loss?: number
+    current_price: number
+    profit_loss: number
 }
 
 export const fetchPortfolioData = async (): Promise<PortfolioData[]> => {
     try {
         const res = await API.get('/api/portfolio')
-        console.log(res.data)
         return res.data
     } catch (error) {
         console.error('Failed to fetch portfolio data:', error)
@@ -24,12 +23,16 @@ export const fetchPortfolioData = async (): Promise<PortfolioData[]> => {
     }
 }
 
-export const addStockTransaction = async (data: {
+export interface StockTransaction {
     symbol: string
     purchase_price: number
     action: 'buy' | 'sell'
     quantity: number
-}): Promise<any> => {
+}
+
+export const addStockTransaction = async (
+    data: StockTransaction
+): Promise<any> => {
     try {
         const response = await API.post(`/api/stocks`, data)
         return response.data

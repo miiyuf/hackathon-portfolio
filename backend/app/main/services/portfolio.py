@@ -7,11 +7,11 @@ portfolio_bp = Blueprint('portfolio', __name__, url_prefix='/api')
 @portfolio_bp.route('/portfolio', methods=['GET'])
 def get_portfolio():
     """
-    Retrieve the portfolio, including holdings and their current prices.
+    Retrieve the portfolio, including holdings, current price, and purchase price
     Returns:
         JSON response with the portfolio details or an error message if the DB connection fails.
     """
-    holdings = fetch_holdings()
+    holdings = fetch_holdings(True)
     portfolio = []
     for holding in holdings:
         symbol = holding['symbol']
