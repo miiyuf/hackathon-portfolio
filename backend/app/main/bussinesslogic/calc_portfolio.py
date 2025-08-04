@@ -53,7 +53,7 @@ def generate_dummy_price(symbol):
     logger.warning(f"Using generated dummy price for {symbol}: {price}")
     return float(price)
 
-def fetch_holdings(include_purchase_price=False):
+def fetch_holdings():
     """
     Retrieve current stock holdings with optional purchase price.
     Args:
