@@ -114,13 +114,5 @@ def get_profit_loss():
 
     logger.info("=== Finished profit_loss calculations ===")
     logger.debug(f"Final profit_loss_data (length: {len(profit_loss_data)}): {profit_loss_data}")
-    
-    # JSON conversion
-    try:
-        result_json = json.dumps(profit_loss_data, cls=DecimalEncoder)
-        logger.debug(f"Successfully converted result to JSON (length: {len(result_json)})")
-    except Exception as e:
-        logger.error(f"Error converting to JSON: {e}")
-        return jsonify({"error": "Error converting result to JSON"}), 500
-        
-    return result_json, 200, {'Content-Type': 'application/json'}
+
+    return jsonify(profit_loss_data)

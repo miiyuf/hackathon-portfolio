@@ -1,8 +1,16 @@
 from flask import Flask, jsonify, request
+from flask.json import JSONEncoder
 from dotenv import load_dotenv
 from apscheduler.schedulers.background import BackgroundScheduler
 import atexit
 from flask_cors import CORS
+from decimal import Decimal
+
+class DecimalJSONEncoder(JSONEncoder):
+    def default(self, obj):
+        if isinstance(obj, Decimal):
+            return float(obj)
+        return super(DecimalJSONEncoder, self).default(obj)
 
 # Blueprint imports
 # from app.main.controller.routes import stockget_bp, stockinsert_bp, holdings_bp, transaction_bp, price_bp, portfolio_bp, profitloss_bp
@@ -21,6 +29,7 @@ from app.main.bussinesslogic.calc_portfolio import update_current_prices
 load_dotenv()
 
 app = Flask(__name__)
+app.json_encoder = DecimalJSONEncoder
 CORS(app, origins="http://localhost:5173")
 
 
