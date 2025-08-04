@@ -29,8 +29,9 @@ from app.main.service.repo_service import update_current_prices
 # Load .env file
 load_dotenv()
 
+# Set the custom JSON provider class before creating the app
+Flask.json_provider_class = CustomJSONProvider
 app = Flask(__name__)
-app.json_encoder = DecimalJSONEncoder
 CORS(app, origins="http://localhost:5173")
 
 
