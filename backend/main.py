@@ -13,10 +13,9 @@ from app.main.service.repo_service import update_current_prices
 # Load .env file
 load_dotenv()
 
-# アプリケーションの作成
+# Set the custom JSON provider class before creating the app
 app = Flask(__name__)
 
-# CORSの設定（1回だけ必要）
 CORS(app, origins="http://localhost:5173")
 
 try:
