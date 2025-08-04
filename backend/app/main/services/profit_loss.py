@@ -4,10 +4,12 @@ import logging
 from decimal import Decimal, InvalidOperation
 import json
 import sys
+import os
 
 # Setup for detailed logging
 logger = logging.getLogger(__name__)
-logger.setLevel(logging.DEBUG)
+log_level = os.environ.get("LOG_LEVEL", "INFO").upper()
+logger.setLevel(getattr(logging, log_level, logging.INFO))
 if not logger.handlers:
     handler = logging.StreamHandler(sys.stdout)
     handler.setFormatter(logging.Formatter('%(asctime)s - %(name)s - %(levelname)s - %(message)s'))
