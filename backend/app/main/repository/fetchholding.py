@@ -1,7 +1,6 @@
-from app.main.db import get_db_connection
+from app.main.database.db import get_db_connection
 import logging
 import yfinance as yf
-from app.main.db import get_db_connection
 from mysql.connector import Error
 
 logging.basicConfig(level=logging.INFO)
