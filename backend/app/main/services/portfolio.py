@@ -13,7 +13,7 @@ def get_portfolio():
     Get portfolio information with detailed holdings.
     
     Returns a JSON object containing:
-    - total_value: Total portfolio value based on investment history
+    - total_net_investment: Total portfolio value based on investment history (total_buy_value - total_sell_value)
     - holdings: List of stock holdings with detailed information
     
     Each holding contains:
@@ -23,7 +23,6 @@ def get_portfolio():
     - total_buy_value: Total amount spent on purchases
     - total_sell_value: Total amount received from sales
     - net_investment: Net amount invested (total_buy_value - total_sell_value)
-    - total_value: Same as net_investment (kept for compatibility)
     - current_price: Current market price per share (if available)
     - market_value: Total current market value (current_price * total_quantity)
     - unrealized_profit_loss: Unrealized profit/loss (market_value - net_investment)
@@ -63,10 +62,7 @@ def get_portfolio():
         holding['total_buy_value'] = str(total_buy_value)
         holding['total_sell_value'] = str(total_sell_value)
         
-        # Set total_value to net_investment
-        holding['total_value'] = str(net_investment)
-        
-        # Keep net_investment as well for clarity
+        # Only use net_investment (remove total_value for consistency)
         holding['net_investment'] = str(net_investment)
         
         # Add current market data if available
@@ -95,7 +91,7 @@ def get_portfolio():
 
     # Response Object Creation
     response_data = {
-        'total_value': str(total_portfolio_value),
+        'total_net_investment': str(total_portfolio_value),
         'holdings': detailed_holdings
     }
     app.logger.info("Sending final portfolio response.")
