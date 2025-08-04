@@ -1,4 +1,5 @@
-import { createContext, useReducer, useContext } from 'react'
+import { createContext, useReducer, useContext, useEffect } from 'react'
+import { fetchPortfolioData } from './api/stocks'
 
 interface TradingModalState {
     isOpen: boolean
@@ -54,56 +55,19 @@ export interface UserStockState {
     stockName: string
     qty: number
     costPrice: number
+    currentPrice: number
+    profitLoss: number
 }
 
 interface UserStocksContextType {
     userStocksState: UserStockState[]
     userStocksDispatch: React.Dispatch<{
         type: string
-        state?: UserStockState
+        state?: UserStockState[]
     }>
 }
 
-const initUserStocksState: UserStockState[] = [
-    { id: 1, ticker: 'AAPL', stockName: 'Apple', qty: 10, costPrice: 35 },
-    {
-        id: 2,
-        ticker: 'NFLX',
-        stockName: 'Netflix',
-        qty: 40,
-        costPrice: 200,
-    },
-    {
-        id: 3,
-        ticker: 'NVDA',
-        stockName: 'Nvidia',
-        qty: 40,
-        costPrice: 160.7,
-    },
-    {
-        id: 4,
-        ticker: 'GOOGL',
-        stockName: 'Alphabet',
-        qty: 15,
-        costPrice: 2800,
-    },
-    { id: 5, ticker: 'AMZN', stockName: 'Amazon', qty: 8, costPrice: 3400 },
-    { id: 6, ticker: 'TSLA', stockName: 'Tesla', qty: 12, costPrice: 700 },
-    {
-        id: 7,
-        ticker: 'MSFT',
-        stockName: 'Microsoft',
-        qty: 25,
-        costPrice: 295,
-    },
-    {
-        id: 8,
-        ticker: 'META',
-        stockName: 'Meta Platforms',
-        qty: 18,
-        costPrice: 355,
-    },
-]
+const initUserStocksState: UserStockState[] = []
 
 const initUserStocksContext: UserStocksContextType = {
     userStocksState: initUserStocksState,
@@ -116,11 +80,11 @@ const UserStocksContext = createContext<UserStocksContextType>(
 
 function userStocksReducer(
     state: UserStockState[],
-    action: { type: string; state?: UserStockState }
+    action: { type: string; state?: UserStockState[] }
 ): UserStockState[] {
     switch (action.type) {
-        case 'ADD_STOCK':
-            return action.state ? [...state, action.state] : state
+        case 'INIT_STOCK':
+            return action.state ? [...action.state] : state
         default:
             throw new Error(`Unknown action type: ${action.type}`)
     }
@@ -142,6 +106,32 @@ export function GlobalProvider({ children }: { children: React.ReactNode }) {
         userStocksReducer,
         initUserStocksState
     )
+
+    useEffect(() => {
+        const testFetch = async () => {
+            try {
+                const data = await fetchPortfolioData()
+                console.log('Global context portfolio data:', data)
+                const portfolioData: UserStockState[] = data.map(
+                    (holding, i) => {
+                        return {
+                            id: i,
+                            ticker: holding.symbol,
+                            stockName: holding.name || 'N/A',
+                            qty: holding.total_quantity,
+                            costPrice: holding.purchase_price,
+                            currentPrice: holding.current_price,
+                            profitLoss: holding.profit_loss,
+                        }
+                    }
+                )
+                userStocksDispatch({ type: 'INIT_STOCK', state: portfolioData })
+            } catch (error) {
+                console.error('Error fetching portfolio data:', error)
+            }
+        }
+        testFetch()
+    }, [tradingModalState.isOpen])
 
     return (
         <TradingContext.Provider
