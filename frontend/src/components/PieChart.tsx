@@ -81,7 +81,7 @@ function PieChart(props: PieChartProps) {
                 ])
                 break
         }
-    }, [pieChartView])
+    }, [pieChartView, userStocksState])
     return (
         <div>
             <MuiPieChart

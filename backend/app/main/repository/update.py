@@ -1,4 +1,6 @@
-from app.main.db import get_db_connection
+from app.main.database.db import get_db_connection
+from mysql.connector import Error
+from app.main.service.calc_portfolio import get_real_price
 
 def update_current_prices():
     """

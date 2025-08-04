@@ -1,4 +1,6 @@
-from app.main.businesslogic.calc_portfolio import fetch_holdings, get_real_price
+# from app.main.businesslogic.calc_portfolio import fetch_holdings, get_real_price
+from app.main.service.calc_portfolio import get_real_price
+from app.main.repository.fetchholding import fetch_holdings
 from flask import Blueprint, request, jsonify
 from decimal import Decimal, InvalidOperation
 
@@ -9,7 +11,7 @@ def get_portfolio():
     Returns:
         JSON response with the portfolio details or an error message if the DB connection fails.
     """
-    holdings = fetch_holdings()
+    holdings = fetch_holdings(True)
     portfolio = []
     for holding in holdings:
         symbol = holding['symbol']

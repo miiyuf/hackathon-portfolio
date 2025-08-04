@@ -6,3 +6,4 @@ pydantic
 yfinance
 apscheduler
 flask_cors
+pytest

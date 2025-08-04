@@ -53,10 +53,7 @@ def insert_stock():
         name = get_stock_name_from_ticker(data['symbol'])
         if not name:
             raise ValueError(f"Could not retrieve name for {data['symbol']}")
-        result = insert_stock_symbol_pair(data['symbol'], name)
-        if isinstance(result, Error) or (isinstance(result, tuple) and "error" in result[0].lower()):
-            conn.rollback()
-            return jsonify({"error": "Failed to update stock_master table"}), 500
+        insert_stock_symbol_pair(data['symbol'], name)
         return jsonify({"message": "Stock inserted successfully"}), 201
     except Error as e:
         logger.error(f"Error inserting stock: {e}")
@@ -95,6 +92,3 @@ def get_stock_name_from_ticker(ticker):
         return info.get("shortName", None)
     except Exception as e:
         return e
-        if cursor:
-            cursor.close()
-        conn.close()
