@@ -62,7 +62,7 @@ def get_portfolio():
         holding['total_buy_value'] = str(total_buy_value)
         holding['total_sell_value'] = str(total_sell_value)
         
-        # Only use net_investment (remove total_value for consistency)
+        # Only use net_investment
         holding['net_investment'] = str(net_investment)
         
         # Add current market data if available
