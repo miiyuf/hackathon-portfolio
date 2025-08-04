@@ -1,13 +1,12 @@
 import React from 'react'
 import { LineChart, lineElementClasses } from '@mui/x-charts/LineChart'
+import { useSelectedStockContext } from '../contexts/SelectedStockContext'
 const uData = [1000, 2800, 1050, 1890, 1505, 3800]
 const xLabels = ['Jul 1', 'Jul 7', 'Jul 14', 'Jul 21', 'Jul 28', 'Today']
 
-interface LineGraphProps {
-    selectedUserStock: string
-}
-function LineGraph(props: LineGraphProps) {
-    const { selectedUserStock } = props
+function LineGraph() {
+    const { selectedStockState, selectedStockDispatch } =
+        useSelectedStockContext()
     return (
         <div>
             <LineChart
@@ -16,7 +15,7 @@ function LineGraph(props: LineGraphProps) {
                 series={[
                     {
                         data: uData,
-                        label: `${selectedUserStock}`,
+                        label: `${selectedStockState}`,
                         area: true,
                         showMark: false,
                         color: 'rgba(28, 144, 30, 0.5)',

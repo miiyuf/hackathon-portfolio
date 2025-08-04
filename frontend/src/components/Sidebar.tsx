@@ -52,18 +52,6 @@ function Sidebar() {
                     </ListItemButton>
                 </ListItem>
                 <ListItem
-                    key={'trade'}
-                    disablePadding
-                    onClick={() => navigate('/trade')}
-                >
-                    <ListItemButton>
-                        <ListItemIcon>
-                            <AutoGraphIcon />
-                        </ListItemIcon>
-                        <ListItemText primary={'Trade'} />
-                    </ListItemButton>
-                </ListItem>
-                <ListItem
                     key={'history'}
                     disablePadding
                     onClick={() => navigate('/history')}
@@ -73,6 +61,18 @@ function Sidebar() {
                             <HistoryIcon />
                         </ListItemIcon>
                         <ListItemText primary={'History'} />
+                    </ListItemButton>
+                </ListItem>
+                <ListItem
+                    key={'trade'}
+                    disablePadding
+                    onClick={() => navigate('/trade')}
+                >
+                    <ListItemButton>
+                        <ListItemIcon>
+                            <AutoGraphIcon />
+                        </ListItemIcon>
+                        <ListItemText primary={'Market'} />
                     </ListItemButton>
                 </ListItem>
             </List>

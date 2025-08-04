@@ -9,9 +9,12 @@ import {
     fetchCurrentPrice,
     fetchTransactions,
 } from '../api/stocks'
+import { useSelectedStockContext } from '../contexts/SelectedStockContext'
 
 function Home() {
-    const [selectedUserStock, setSelectedUserStock] = useState('AAPL')
+    // const { selectedStockState, selectedStockDispatch } =
+    //     useSelectedStockContext
+    // const [selectedUserStock, setSelectedUserStock] = useState('AAPL')
 
     // TEST CODE TO CHECK ENDPOINTS
     // useEffect(() => {
@@ -62,11 +65,11 @@ function Home() {
     return (
         <div className="internal-tab home-tab">
             <div style={{ display: 'flex' }}>
-                <PieChart handleStockSelection={setSelectedUserStock} />
-                <LineGraph selectedUserStock={selectedUserStock} />
+                <PieChart />
+                <LineGraph />
             </div>
             <div>
-                <UserStocksTable handleStockSelection={setSelectedUserStock} />
+                <UserStocksTable />
             </div>
         </div>
     )

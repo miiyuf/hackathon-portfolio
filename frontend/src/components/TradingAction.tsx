@@ -11,21 +11,30 @@ import {
     Typography,
     type SelectChangeEvent,
 } from '@mui/material'
-import { useTradingContext } from '../GlobalContext'
+import { useTradingContext } from '../contexts/TradingContext'
 import {
     fetchCurrentPrice,
     addStockTransaction,
     type StockTransaction,
 } from '../api/stocks'
+import { useSelectedStockContext } from '../contexts/SelectedStockContext'
 
 function TradingAction() {
     const { tradingModalState, tradingModalDispatch } = useTradingContext()
+    const { selectedStockState, selectedStockDispatch } =
+        useSelectedStockContext()
 
     const handleOpen = () => {
         tradingModalDispatch({
             type: 'OPEN_MODAL_WITH_DATA',
-            state: { isOpen: true, symbol: '' },
+            state: {
+                isOpen: true,
+                symbol: selectedStockState.selectedStock || '',
+            },
         })
+        if (selectedStockState.selectedStock !== '') {
+            displayCurrentPrice()
+        }
     }
     const handleClose = () => {
         setAction('')
