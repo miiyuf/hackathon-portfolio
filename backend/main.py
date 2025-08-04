@@ -13,17 +13,23 @@ from app.main.service.repo_service import update_current_prices
 # Load .env file
 load_dotenv()
 
-# Set the custom JSON provider class before creating the app
+# Create Flask application
 app = Flask(__name__)
 
+# Configure CORS
 CORS(app, origins="http://localhost:5173")
 
+# Handle Decimal type conversion for JSON responses based on Flask version
 try:
-    # Flask 2.3+
+    # For Flask 2.3+
+    # Initialize app first
+    # Add various settings here
+
+    # Then configure JSON provider
     @app.json.provider_class
     class CustomJSONProvider(app.json.provider):
         def dumps(self, obj, **kwargs):
-            # Decimal -> Float
+            # Convert Decimal -> Float
             def _preprocess_decimal(o):
                 if isinstance(o, Decimal):
                     return float(o)
@@ -35,6 +41,7 @@ try:
                 
             return super().dumps(_preprocess_decimal(obj), **kwargs)
 except (AttributeError, TypeError):
+    # For older Flask versions
     class DecimalJSONEncoder(JSONEncoder):
         def default(self, obj):
             if isinstance(obj, Decimal):
@@ -52,7 +59,7 @@ app.register_blueprint(price_bp)
 app.register_blueprint(portfolio_bp)
 app.register_blueprint(profitloss_bp)
 
-# background scheduler to update current prices every 5 minutes
+# Background scheduler to update current prices every 5 minutes
 scheduler = BackgroundScheduler()
 scheduler.add_job(func=update_current_prices, trigger="interval", minutes=5)
 scheduler.start()
