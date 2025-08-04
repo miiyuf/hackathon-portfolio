@@ -117,4 +117,4 @@ def get_stock_name_from_ticker(ticker):
         info = stock.info
         return info.get("shortName", None)
     except Exception as e:
-        return e
+        return str(e)
