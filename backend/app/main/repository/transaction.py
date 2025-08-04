@@ -13,7 +13,14 @@ def get_transactions():
         return []
 
     cursor = conn.cursor(dictionary=True)
-    cursor.execute("SELECT * FROM stocks ORDER BY id DESC;")
+    query = """
+    SELECT stocks.id, stocks.symbol, stock_master.name, stocks.purchase_price, 
+    stocks.action, stocks.quantity
+    FROM stocks
+    JOIN stock_master ON stocks.symbol=stock_master.symbol
+    ORDER BY stocks.id DESC;
+    """
+    cursor.execute(query)
     results = cursor.fetchall()
     cursor.close()
     conn.close()
