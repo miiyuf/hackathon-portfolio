@@ -124,8 +124,8 @@ def update_current_prices():
             
             # Generate random prices for demo/testing (remove in production)
             import random
-            real_price = round(random.uniform(50, 500), 2)
-            logger.info(f"Generated test price for {symbol}: {real_price}")
+            dummy_price = round(random.uniform(50, 500), 2)
+            logger.info(f"Generated test price for {symbol}: {dummy_price}")
             
             try:
                 # Insert or update record in the current_prices table
