@@ -6,23 +6,52 @@ from mysql.connector import Error
 logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger(__name__)
 
-def get_real_price(symbol):
+def get_real_price(symbol, fallback_to_dummy=False):
     """
-    Fetch the real-time price of a stock using yfinance.
+    Retrieve the current price for the specified stock symbol.
     Args:
-        symbol (str): Stock symbol.
+        symbol: Stock ticker symbol
+        fallback_to_dummy: If True, returns a dummy value when price is not found
     Returns:
-        float: Current price of the stock, or None if an error occurs.
+        float: Current price or None if not available
     """
     try:
-        stock = yf.Ticker(symbol)
-        price = stock.history(period="1d")["Close"].iloc[-1]
-        return price
+        logger.info(f"get_real_price: Fetching price for {symbol}")
+        
+        conn = get_db_connection()
+        if not conn:
+            logger.error("get_real_price: Database connection failed")
+            return None if not fallback_to_dummy else generate_dummy_price(symbol)
+            
+        cursor = conn.cursor(dictionary=True)
+        query = "SELECT current_price FROM current_prices WHERE symbol = %s"
+        cursor.execute(query, (symbol,))
+        result = cursor.fetchone()
+        
+        if result and result['current_price']:
+            logger.info(f"get_real_price: Found price for {symbol}: {result['current_price']}")
+            return result['current_price']
+        else:
+            logger.warning(f"get_real_price: No price found for {symbol}")
+            return None if not fallback_to_dummy else generate_dummy_price(symbol)
+            
     except Exception as e:
-        print(f"Error fetching price for {symbol}: {e}")
-        return None
-    
+        logger.error(f"get_real_price: Error fetching price for {symbol}: {e}")
+        return None if not fallback_to_dummy else generate_dummy_price(symbol)
+    finally:
+        if 'cursor' in locals() and cursor:
+            cursor.close()
+        if 'conn' in locals() and conn:
+            conn.close()
 
+def generate_dummy_price(symbol):
+    """Generate a test price based on the symbol's hash value"""
+    import hashlib
+    # Generate a price between 100-500 based on the hash value of the symbol
+    hash_val = int(hashlib.md5(symbol.encode()).hexdigest(), 16)
+    price = 100 + (hash_val % 400)
+    logger.warning(f"Using generated dummy price for {symbol}: {price}")
+    return float(price)
 
 def fetch_holdings(include_purchase_price=False):
     """
@@ -39,45 +68,22 @@ def fetch_holdings(include_purchase_price=False):
 
     cursor = conn.cursor(dictionary=True)
 
-    if include_purchase_price:
-        query = """
-            SELECT 
-                total.symbol,
-                sm.name,
-                total.total_quantity,
-                ROUND(buy.total_buy_value / NULLIF(buy.total_buy_quantity, 0), 2) AS purchase_price
-            FROM (
-                SELECT 
-                    symbol,
-                    SUM(CASE WHEN action = 'buy' THEN quantity ELSE -quantity END) AS total_quantity
-                FROM stocks
-                GROUP BY symbol
-                HAVING total_quantity > 0
-            ) AS total
-            LEFT JOIN (
-                SELECT 
-                    symbol,
-                    SUM(purchase_price * quantity) AS total_buy_value,
-                    SUM(quantity) AS total_buy_quantity
-                FROM stocks
-                WHERE action = 'buy'
-                GROUP BY symbol
-            ) AS buy ON total.symbol = buy.symbol
-            LEFT JOIN stock_master sm ON total.symbol = sm.symbol;
-        """
-        logger.info("Including purchase price in the query.")
-    else:
-        query = """
-            SELECT 
-                s.symbol,
-                sm.name,
-                SUM(CASE WHEN s.action = 'buy' THEN s.quantity ELSE -s.quantity END) AS total_quantity
-            FROM stocks s
-            LEFT JOIN stock_master sm ON s.symbol = sm.symbol
-            GROUP BY s.symbol, sm.name
-            HAVING total_quantity > 0;
-        """
-        logger.info("Fetching holdings without purchase price.")
+    # Query modified to include total buy and sell values
+    query = """
+        SELECT 
+            s.symbol,
+            sm.name,
+            SUM(CASE WHEN s.action = 'buy' THEN s.quantity ELSE -s.quantity END) AS total_quantity,
+            SUM(CASE WHEN s.action = 'buy' THEN s.quantity * s.purchase_price ELSE 0 END) AS total_buy_value,
+            SUM(CASE WHEN s.action = 'sell' THEN s.quantity * s.purchase_price ELSE 0 END) AS total_sell_value
+        FROM stocks s
+        LEFT JOIN stock_master sm ON s.symbol = sm.symbol
+        GROUP BY s.symbol, sm.name
+        HAVING SUM(CASE WHEN s.action = 'buy' THEN s.quantity ELSE -s.quantity END) > 0
+    """
+    
+    logger.info("Fetching holdings with buy/sell values.")
+
     try:
         cursor.execute(query)
         results = cursor.fetchall()
@@ -92,33 +98,54 @@ def fetch_holdings(include_purchase_price=False):
 
     return results
 
-
 def update_current_prices():
     """
     Fetch and update the latest stock prices for all stocks in the database.
     """
+    logger.info("Starting update of current prices")
     conn = get_db_connection()
     if isinstance(conn, tuple):
-        print("Database connection failed.")
+        logger.error("Database connection failed.")
         return
 
-    cursor = conn.cursor(dictionary=True)
-    cursor.execute("SELECT DISTINCT symbol FROM stocks;")
-    symbols = cursor.fetchall()
+    try:
+        cursor = conn.cursor(dictionary=True)
+        # Get all distinct stock symbols
+        cursor.execute("SELECT DISTINCT symbol FROM stocks;")
+        symbols = cursor.fetchall()
+        logger.info(f"Found {len(symbols)} distinct symbols in stocks table")
 
-    for record in symbols:
-        symbol = record['symbol']
-        current_price = get_real_price(symbol)
-        if current_price is None:
-            print(f"Failed to fetch price for {symbol}.")
-            continue
-        try:
-            update_query = "UPDATE stocks SET current_price = %s WHERE symbol = %s;"
-            cursor.execute(update_query, (current_price, symbol))
-            conn.commit()
-            print(f"Updated price for {symbol}: {current_price}")
-        except Error as e:
-            print(f"Error updating price for {symbol}: {e}")
+        for record in symbols:
+            symbol = record['symbol']
+            
+            # In a production environment, fetch real prices using Yahoo Finance API
+            # Example: stock_data = yf.Ticker(symbol)
+            # real_price = stock_data.info.get('regularMarketPrice')
+            
+            # Generate random prices for demo/testing (remove in production)
+            import random
+            real_price = round(random.uniform(50, 500), 2)
+            logger.info(f"Generated test price for {symbol}: {real_price}")
+            
+            try:
+                # Insert or update record in the current_prices table
+                update_query = """
+                INSERT INTO current_prices (symbol, current_price, last_updated) 
+                VALUES (%s, %s, NOW()) 
+                ON DUPLICATE KEY UPDATE current_price = %s, last_updated = NOW();
+                """
+                cursor.execute(update_query, (symbol, real_price, real_price))
+                conn.commit()
+                logger.info(f"Updated price for {symbol}: {real_price}")
+            except Error as e:
+                logger.error(f"Error updating price for {symbol}: {e}")
+                conn.rollback()
 
-    cursor.close()
-    conn.close()
+    except Error as e:
+        logger.error(f"Error in update_current_prices: {e}")
+    finally:
+        if 'cursor' in locals() and cursor:
+            cursor.close()
+        if conn:
+            conn.close()
+        logger.info("Completed update of current prices")
