@@ -1,7 +1,9 @@
-from app.main.database.db import get_db_connection
+from app.main.db import get_db_connection
 from flask import Blueprint, request, jsonify
 
+holdings_bp = Blueprint('holdings', __name__, url_prefix='/api')
 
+@holdings_bp.route('/holdings', methods=['GET'])
 def get_holdings():
     """
     Retrieve the current holdings by calculating the net quantity of each stock.
@@ -27,5 +29,4 @@ def get_holdings():
     cursor.close()
     conn.close()
 
-
-    return results
+    return jsonify(results)
