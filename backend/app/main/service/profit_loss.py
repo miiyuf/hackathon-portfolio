@@ -1,5 +1,6 @@
 from flask import Blueprint, jsonify
-from app.main.service.calc_portfolio import get_real_price, fetch_holdings
+from app.main.service.calc_portfolio import get_real_price
+from app.main.service.portfolio import fetch_holdings
 import logging
 from decimal import Decimal, InvalidOperation
 import sys
