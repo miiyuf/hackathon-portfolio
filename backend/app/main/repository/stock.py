@@ -1,4 +1,5 @@
 from app.main.database.db import get_db_connection
+from app.main.service import repo_service
 from flask import Blueprint, request, jsonify
 from mysql.connector import Error
 import yfinance as yf
@@ -95,7 +96,7 @@ def insert_stock(data):
         return jsonify({"error": error_message}), 500
         
     logger.info(f"Getting stock name for {data['symbol']}")
-    name = get_stock_name_from_ticker(data['symbol'])
+    name = repo_service.get_stock_name_from_ticker(data['symbol'])
     if not name:
         logger.warning(f"Could not retrieve name for {data['symbol']}")
         name = data['symbol']
@@ -199,18 +200,3 @@ def insert_stock_symbol_pair_if_not_exists(ticker, name):
         if conn:
             conn.close()
         logger.info("Closing database connections")
-
-def get_stock_name_from_ticker(ticker):
-    logger.info(f"Fetching stock name for ticker: {ticker}")
-    try:
-        stock = yf.Ticker(ticker)
-        info = stock.info
-        name = info.get("shortName", None)
-        if name:
-            logger.info(f"Retrieved name for {ticker}: {name}")
-        else:
-            logger.warning(f"Could not find name for {ticker}")
-        return name
-    except Exception as e:
-        logger.error(f"Error retrieving stock name for {ticker}: {e}")
-        return None
