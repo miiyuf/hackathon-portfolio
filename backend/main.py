@@ -6,6 +6,7 @@ from apscheduler.schedulers.background import BackgroundScheduler
 import atexit
 from flask_cors import CORS
 from decimal import Decimal
+from datetime import datetime  # added
 
 # Blueprint imports
 from app.main.controller.routes import stockget_bp, stockinsert_bp, holdings_bp, transaction_bp, price_bp, portfolio_bp, profitloss_bp
@@ -43,13 +44,15 @@ try:
             return super().dumps(_preprocess_decimal(obj), **kwargs)
 except (AttributeError, TypeError):
     # For older Flask versions
-    class DecimalJSONEncoder(JSONEncoder):
+    class CustomJSONEncoder(JSONEncoder):
         def default(self, obj):
             if isinstance(obj, Decimal):
                 return float(obj)
-            return super(DecimalJSONEncoder, self).default(obj)
-    
-    app.json_encoder = DecimalJSONEncoder
+            elif isinstance(obj, datetime):
+                return obj.isoformat()
+            return super(CustomJSONEncoder, self).default(obj)
+
+    app.json_encoder = CustomJSONEncoder
 
 # Register blueprints for stock and trade routes
 app.register_blueprint(stockinsert_bp)
