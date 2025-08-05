@@ -31,7 +31,7 @@ def get_portfolio():
     # Function Entry Log
     app.logger.info("Received request for GET /api/portfolio.")
     
-    holdings = fetch_holdings()
+    holdings = fetch_holdings(True)
     # After DB Fetch Log
     app.logger.info(f"Fetched {len(holdings)} unique holdings from the database.")
     
@@ -42,6 +42,7 @@ def get_portfolio():
         symbol = holding['symbol']
         # Inside Loop Log
         app.logger.info(f"Processing symbol: {symbol}...")
+        # app.logger.info(f"Holding: {holding}")
         
         # Fetch current price for display purposes
         current_price = get_real_price(symbol)

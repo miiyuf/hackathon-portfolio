@@ -16,7 +16,7 @@ export interface PortfolioData {
 export const fetchPortfolioData = async (): Promise<PortfolioData[]> => {
     try {
         const res = await API.get('/api/portfolio')
-        return res.data
+        return res.data.holdings
     } catch (error) {
         console.error('Failed to fetch portfolio data:', error)
         throw error
