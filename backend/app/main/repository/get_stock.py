@@ -1,9 +1,9 @@
 from app.main.db import get_db_connection
 from flask import Blueprint, request, jsonify
 
-# stockget_bp = Blueprint('get_stocks', __name__, url_prefix='/api')
+stockget_bp = Blueprint('get_stocks', __name__, url_prefix='/api')
 
-# @stockget_bp.route('/stocks', methods=['GET'])
+@stockget_bp.route('/stocks', methods=['GET'])
 def get_stocks():
     """
     Retrieve all stock records from the 'stocks' table.
