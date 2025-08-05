@@ -9,7 +9,7 @@
 | action         | enum('buy','sell') | NO   |     | NULL    |                |
 | quantity       | int                | NO   |     | 1       |                |
 
-## Table: `portfolio_master`
+## Table: `stock_master`
 | Field  | Type         | Null | Key | Default | Extra |
 |--------|--------------|------|-----|---------|-------|
 | symbol | varchar(10)  | NO   | PRI | NULL    |       |

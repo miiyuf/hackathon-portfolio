@@ -25,7 +25,7 @@ def get_stocks():
         cursor = conn.cursor(dictionary=True)
         
         logger.info("Executing query to fetch all stocks")
-        cursor.execute("SELECT * FROM portfolio;")
+        cursor.execute("SELECT * from transactions;")
         results = cursor.fetchall()
         
         logger.info(f"Retrieved {len(results)} stock records from database")
@@ -174,7 +174,7 @@ def insert_stock_symbol_pair_if_not_exists(ticker, name):
         cursor = conn.cursor(dictionary=True)
         
         # Check if symbol already exists
-        check_query = "SELECT symbol FROM portfolio_master WHERE symbol = %s"
+        check_query = "SELECT symbol FROM stock_master WHERE symbol = %s"
         cursor.execute(check_query, (ticker,))
         existing = cursor.fetchone()
         
@@ -184,7 +184,7 @@ def insert_stock_symbol_pair_if_not_exists(ticker, name):
             
         # Insert new symbol-name pair
         insert_query = """
-            INSERT INTO portfolio_master (symbol, name)
+            INSERT INTO stock_master (symbol, name)
             VALUES (%s, %s)
         """
         values = (ticker, name)

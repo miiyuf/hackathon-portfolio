@@ -31,7 +31,7 @@ CREATE TABLE `current_prices` (
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
--- Table structure for table `portfolio_master`
+-- Table structure for table `stock_master`
 --
 
 DROP TABLE IF EXISTS `portfolio_master`;
