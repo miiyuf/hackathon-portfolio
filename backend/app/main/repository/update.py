@@ -1,6 +1,6 @@
 from app.main.database.db import get_db_connection
 from mysql.connector import Error
-from app.main.service.calc_portfolio import get_real_price
+from app.main.service.getrealprice import get_real_price
 
 def update_current_prices():
     """
@@ -12,7 +12,7 @@ def update_current_prices():
         return
 
     cursor = conn.cursor(dictionary=True)
-    cursor.execute("SELECT DISTINCT symbol FROM stocks;")
+    cursor.execute("SELECT DISTINCT symbol from transactions;")
     symbols = cursor.fetchall()
 
     for record in symbols:
@@ -22,7 +22,7 @@ def update_current_prices():
             print(f"Failed to fetch price for {symbol}.")
             continue
         try:
-            update_query = "UPDATE stocks SET current_price = %s WHERE symbol = %s;"
+            update_query = "UPDATE transactions SET current_price = %s WHERE symbol = %s;"
             cursor.execute(update_query, (current_price, symbol))
             conn.commit()
             print(f"Updated price for {symbol}: {current_price}")

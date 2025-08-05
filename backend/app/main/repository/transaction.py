@@ -1,9 +1,9 @@
 from app.main.db import get_db_connection
 from flask import Blueprint, request, jsonify
 
-transaction_bp = Blueprint('transaction', __name__, url_prefix='/api')
+# transaction_bp = Blueprint('transaction', __name__, url_prefix='/api')
 
-@transaction_bp.route('/transaction', methods=['GET'])
+# @transaction_bp.route('/transaction', methods=['GET'])
 def get_transactions():
     """
     Fetch all transactions from the 'stocks' table, ordered by ID (latest first).
@@ -15,6 +15,7 @@ def get_transactions():
         return jsonify({"error": "DB connection failed"}), 500
 
     cursor = conn.cursor(dictionary=True)
+
     query = """
     SELECT stocks.id, stocks.symbol, stock_master.name, stocks.purchase_price, 
     stocks.action, stocks.quantity
@@ -23,6 +24,7 @@ def get_transactions():
     ORDER BY stocks.id DESC;
     """
     cursor.execute(query)
+
     results = cursor.fetchall()
     cursor.close()
     conn.close()

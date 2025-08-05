@@ -10,16 +10,16 @@ def get_stocks():
     result = repo_service.get_stocks()
     if not result:
         return jsonify({"error": "No stocks found"}), 404
-    return jsonify(result)
+    return result
 
 price_bp = Blueprint('price', __name__, url_prefix='/api')
 
 @price_bp.route('/price/<symbol>', methods=['GET'])
 def get_stock_price(symbol):
-    price = Price.get_stock_price(symbol)
-    if price is None:
+    result = Price.get_stock_price(symbol)
+    if result is None:
         return jsonify({"error": f"Could not fetch price for symbol: {symbol}"}), 500
-    return jsonify({"symbol": symbol, "price": price})
+    return result
 
 holdings_bp = Blueprint('holdings', __name__, url_prefix='/api')
 
@@ -28,20 +28,23 @@ def get_holdings():
     result = repo_service.get_holdings()
     if not result:
         return jsonify({"error": "No holdings found"}), 404
-    return jsonify(result)
+    return result
 
 stockinsert_bp = Blueprint('insert_stocks', __name__, url_prefix='/api')
 
 @stockinsert_bp.route('/stocks', methods=['POST'])  
 def insert_stock():
     data = request.get_json()
+    if not data:
+        return jsonify({"error": "Invalid JSON data"}), 400
 
-    required_fields = ['symbol', 'purchase_price', 'action', 'quantity']
+    required_fields = ['symbol', 'action', 'quantity']
     if not all(field in data for field in required_fields):
-        return jsonify({"error": "Missing required fields"}), 400
-    
-    result = repo_service.insert_stock(data)
-    return result
+        missing = [field for field in required_fields if field not in data]
+        return jsonify({"error": f"Missing required fields: {missing}"}), 400
+
+    result, status_code = repo_service.insert_stock(data)
+    return jsonify(result), status_code
 
 transaction_bp = Blueprint('transaction', __name__, url_prefix='/api')
 
@@ -50,8 +53,7 @@ def get_transactions():
     result = repo_service.get_transactions()
     if not result:
         return jsonify({"error": "No transactions found"}), 404
-    return jsonify(result)
-
+    return result
 
 profitloss_bp = Blueprint('profit_loss', __name__, url_prefix='/api')
 
@@ -60,7 +62,7 @@ def get_profit_loss():
     result = profit_loss.get_profit_loss()
     if not result:
         return jsonify({"error": "No profit/loss data found"}), 404
-    return jsonify(result)
+    return result
 
 portfolio_bp = Blueprint('portfolio', __name__, url_prefix='/api')
 
@@ -69,6 +71,6 @@ def get_portfolio():
     result = portfolio.get_portfolio()
     if not result:
         return jsonify({"error": "No portfolio data found"}), 404
-    return jsonify(result)
+    return result
 
 

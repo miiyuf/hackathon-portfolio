@@ -34,7 +34,7 @@ CREATE TABLE `current_prices` (
 -- Table structure for table `stock_master`
 --
 
-DROP TABLE IF EXISTS `stock_master`;
+DROP TABLE IF EXISTS `portfolio_master`;
 /*!40101 SET @saved_cs_client     = @@character_set_client */;
 /*!50503 SET character_set_client = utf8mb4 */;
 CREATE TABLE `stock_master` (
@@ -45,13 +45,13 @@ CREATE TABLE `stock_master` (
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
--- Table structure for table `stocks`
+-- Table structure for table `portfolio`
 --
 
-DROP TABLE IF EXISTS `stocks`;
+DROP TABLE IF EXISTS `portfolio`;
 /*!40101 SET @saved_cs_client     = @@character_set_client */;
 /*!50503 SET character_set_client = utf8mb4 */;
-CREATE TABLE `stocks` (
+CREATE TABLE `transactions` (
   `id` int NOT NULL AUTO_INCREMENT,
   `symbol` varchar(10) NOT NULL,
   `purchase_price` decimal(10,2) NOT NULL,
