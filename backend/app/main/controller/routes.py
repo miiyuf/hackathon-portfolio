@@ -35,13 +35,16 @@ stockinsert_bp = Blueprint('insert_stocks', __name__, url_prefix='/api')
 @stockinsert_bp.route('/stocks', methods=['POST'])  
 def insert_stock():
     data = request.get_json()
+    if not data:
+        return jsonify({"error": "Invalid JSON data"}), 400
 
-    required_fields = ['symbol', 'purchase_price', 'action', 'quantity']
+    required_fields = ['symbol', 'action', 'quantity']
     if not all(field in data for field in required_fields):
-        return jsonify({"error": "Missing required fields"}), 400
-    
-    result = repo_service.insert_stock(data)
-    return result
+        missing = [field for field in required_fields if field not in data]
+        return jsonify({"error": f"Missing required fields: {missing}"}), 400
+
+    result, status_code = repo_service.insert_stock(data)
+    return jsonify(result), status_code
 
 transaction_bp = Blueprint('transaction', __name__, url_prefix='/api')
 
