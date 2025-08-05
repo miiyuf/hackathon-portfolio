@@ -15,7 +15,7 @@ def get_transactions():
         return jsonify({"error": "DB connection failed"}), 500
 
     cursor = conn.cursor(dictionary=True)
-    cursor.execute("SELECT * FROM stocks ORDER BY id DESC;")
+    cursor.execute("SELECT * FROM portfolio ORDER BY id DESC;")
     results = cursor.fetchall()
     cursor.close()
     conn.close()

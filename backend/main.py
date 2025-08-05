@@ -1,5 +1,6 @@
 from flask import Flask, jsonify, request
-from flask.json import JSONEncoder
+import json
+from json import JSONEncoder
 from dotenv import load_dotenv
 from apscheduler.schedulers.background import BackgroundScheduler
 import atexit

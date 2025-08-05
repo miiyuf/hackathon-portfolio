@@ -20,7 +20,7 @@ def get_stocks():
 
 
     cursor = conn.cursor(dictionary=True)
-    cursor.execute("SELECT * FROM stocks;")
+    cursor.execute("SELECT * FROM portfolio;")
     results = cursor.fetchall()
     cursor.close()
     conn.close()
@@ -58,6 +58,20 @@ def insert_stock(data):
     if data['action'] not in ['buy', 'sell']:
         return jsonify({"error": "Action must be either 'buy' or 'sell'"}), 400
 
+    if 'purchase_price' not in data:
+        try:
+            ticker = yf.Ticker(data['symbol'])
+            current_data = ticker.history(period="1d")
+            
+            if current_data.empty:
+                return jsonify({"error": f"Could not fetch current price for {data['symbol']}"}), 400
+                
+            current_price = float(current_data['Close'].iloc[-1])
+            data['purchase_price'] = current_price
+            logger.info(f"Automatically fetched current price for {data['symbol']}: {current_price}")
+        except Exception as e:
+            logger.error(f"Error fetching current price for {data['symbol']}: {e}")
+            return jsonify({"error": f"Failed to fetch current price: {str(e)}"}), 500
     conn = get_db_connection()
     if isinstance(conn, tuple):
         return conn
@@ -65,7 +79,7 @@ def insert_stock(data):
     try:
         cursor = conn.cursor()
         query = """
-            INSERT INTO stocks (symbol, purchase_price, action, quantity)
+            INSERT INTO portfolio (symbol, purchase_price, action, quantity)
             VALUES (%s, %s, %s, %s)
         """
         values = (
@@ -80,14 +94,19 @@ def insert_stock(data):
         if not name:
             raise ValueError(f"Could not retrieve name for {data['symbol']}")
         insert_stock_symbol_pair(data['symbol'], name)
-        return jsonify({"message": "Stock inserted successfully"}), 201
+        
+        return jsonify({
+            "message": "Stock inserted successfully",
+            "used_price": data['purchase_price'],
+            "price_source": "user_provided" if 'purchase_price' in data else "yahoo_finance"
+        }), 201
     except Error as e:
         logger.error(f"Error inserting stock: {e}")
         return jsonify({"error": str(e)}), 500
     finally:
         cursor.close()
         conn.close()
-   
+
 def insert_stock_symbol_pair(ticker, name):
     conn = get_db_connection()
     if isinstance(conn, tuple):
@@ -95,7 +114,7 @@ def insert_stock_symbol_pair(ticker, name):
     try:
         cursor = conn.cursor()
         query = """
-            INSERT INTO stock_master (symbol, name)
+            INSERT INTO portfolio_master (symbol, name)
             VALUES (%s, %s)
         """
         values = (
