@@ -1,6 +1,6 @@
 from flask import Blueprint, jsonify
-from app.main.service.calc_portfolio import get_real_price
-from app.main.service.portfolio import fetch_holdings
+from app.main.service.getrealprice import get_real_price
+from app.main.repository.fetchholding import fetch_holdings
 import logging
 from decimal import Decimal, InvalidOperation
 import sys
@@ -16,9 +16,9 @@ if not logger.handlers:
     handler.setFormatter(logging.Formatter('%(asctime)s - %(name)s - %(levelname)s - %(message)s'))
     logger.addHandler(handler)
 
-profitloss_bp = Blueprint('profit_loss', __name__, url_prefix='/api')
+# profitloss_bp = Blueprint('profit_loss', __name__, url_prefix='/api')
 
-@profitloss_bp.route('/profit_loss', methods=['GET'])
+# @profitloss_bp.route('/profit_loss', methods=['GET'])
 def get_profit_loss():
     """
     Calculate profit/loss for each holding.

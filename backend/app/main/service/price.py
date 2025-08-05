@@ -1,9 +1,9 @@
-from app.main.service.calc_portfolio import get_real_price
+from app.main.service.getrealprice import get_real_price
 from flask import Blueprint, request, jsonify
 
-price_bp = Blueprint('price', __name__, url_prefix='/api')
+# price_bp = Blueprint('price', __name__, url_prefix='/api')
 
-@price_bp.route('/price/<symbol>', methods=['GET'])
+# @price_bp.route('/price/<symbol>', methods=['GET'])
 def get_stock_price(symbol):
     """
     Retrieve the real-time price of a stock using its symbol.

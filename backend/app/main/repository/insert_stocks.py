@@ -6,9 +6,9 @@ import logging
 
 logger = logging.getLogger(__name__)
 
-stockinsert_bp = Blueprint('insert_stocks', __name__, url_prefix='/api')
+# stockinsert_bp = Blueprint('insert_stocks', __name__, url_prefix='/api')
 
-@stockinsert_bp.route('/stocks', methods=['POST'])  
+# @stockinsert_bp.route('/stocks', methods=['POST'])  
 def insert_stock():
     """
     Insert a new stock record into the 'stocks' table.

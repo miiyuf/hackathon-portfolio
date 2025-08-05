@@ -25,7 +25,7 @@ def get_stocks():
     cursor.close()
     conn.close()
 
-    return results
+    return jsonify(results)
 
 
 
