@@ -10,16 +10,16 @@ def get_stocks():
     result = repo_service.get_stocks()
     if not result:
         return jsonify({"error": "No stocks found"}), 404
-    return jsonify(result)
+    return result
 
 price_bp = Blueprint('price', __name__, url_prefix='/api')
 
 @price_bp.route('/price/<symbol>', methods=['GET'])
 def get_stock_price(symbol):
-    price = Price.get_stock_price(symbol)
-    if price is None:
+    result = Price.get_stock_price(symbol)
+    if result is None:
         return jsonify({"error": f"Could not fetch price for symbol: {symbol}"}), 500
-    return jsonify({"symbol": symbol, "price": price})
+    return result
 
 holdings_bp = Blueprint('holdings', __name__, url_prefix='/api')
 
@@ -28,7 +28,7 @@ def get_holdings():
     result = repo_service.get_holdings()
     if not result:
         return jsonify({"error": "No holdings found"}), 404
-    return jsonify(result)
+    return result
 
 stockinsert_bp = Blueprint('insert_stocks', __name__, url_prefix='/api')
 
@@ -53,8 +53,7 @@ def get_transactions():
     result = repo_service.get_transactions()
     if not result:
         return jsonify({"error": "No transactions found"}), 404
-    return jsonify(result)
-
+    return result
 
 profitloss_bp = Blueprint('profit_loss', __name__, url_prefix='/api')
 
@@ -63,7 +62,7 @@ def get_profit_loss():
     result = profit_loss.get_profit_loss()
     if not result:
         return jsonify({"error": "No profit/loss data found"}), 404
-    return jsonify(result)
+    return result
 
 portfolio_bp = Blueprint('portfolio', __name__, url_prefix='/api')
 
@@ -72,6 +71,6 @@ def get_portfolio():
     result = portfolio.get_portfolio()
     if not result:
         return jsonify({"error": "No portfolio data found"}), 404
-    return jsonify(result)
+    return result
 
 

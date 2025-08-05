@@ -1,4 +1,4 @@
-from app.main.service.calc_portfolio import get_real_price
+from app.main.service.getrealprice import get_real_price
 from app.main.repository.fetchholding import fetch_holdings
 from flask import Blueprint, request, jsonify
 from decimal import Decimal, InvalidOperation

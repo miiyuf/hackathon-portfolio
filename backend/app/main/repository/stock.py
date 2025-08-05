@@ -100,7 +100,7 @@ def insert_stock(data):
     logger.info(f"Inserting symbol-name pair: {data['symbol']} - {name}")
     insert_stock_symbol_pair_if_not_exists(data['symbol'], name)
     
-    price_source = "user_provided" if 'purchase_price' in request.get_json() else "yahoo_finance"
+    price_source = "user_provided" if 'purchase_price' in data else "yahoo_finance"
     logger.info(f"Stock inserted successfully. Price source: {price_source}")
     return jsonify({
         "message": "Stock inserted successfully",
