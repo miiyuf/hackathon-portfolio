@@ -90,6 +90,8 @@ def insert_stock(data):
         logger.info(f"Using symbol as name fallback: {name}")
     
     # Call repository layer
+    # NOTE: All validation is performed in the service layer above.
+    # The repository layer (insert_stock_record) should not duplicate validation logic.
     logger.debug(f"Calling repository layer to insert stock record for {data['symbol']}")
     db_start_time = time.time()
     success, db_error = stock.insert_stock_record(data)
