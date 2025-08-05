@@ -126,7 +126,7 @@ def insert_stock_record(data):
         logger.info("Creating database cursor")
         cursor = conn.cursor()
         query = """
-            INSERT INTO portfolio (symbol, purchase_price, action, quantity)
+            INSERT INTO transactions (symbol, purchase_price, action, quantity)
             VALUES (%s, %s, %s, %s)
         """
         values = (
