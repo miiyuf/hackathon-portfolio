@@ -126,7 +126,7 @@ def insert_stock_record(data):
         logger.info("Creating database cursor")
         cursor = conn.cursor()
         query = """
-            INSERT INTO portfolio (symbol, purchase_price, action, quantity)
+            INSERT INTO transactions (symbol, purchase_price, action, quantity)
             VALUES (%s, %s, %s, %s)
         """
         values = (
@@ -138,16 +138,9 @@ def insert_stock_record(data):
         logger.info(f"Executing insert query with values: {values}")
         cursor.execute(query, values)
         conn.commit()
-        name = get_stock_name_from_ticker(data['symbol'])
-        if not name:
-            raise ValueError(f"Could not retrieve name for {data['symbol']}")
-        insert_stock_symbol_pair_if_not_exists(data['symbol'], name)
-        
-        return jsonify({
-            "message": "Stock inserted successfully",
-            "used_price": data['purchase_price'],
-            "price_source": "user_provided" if 'purchase_price' in data else "yahoo_finance"
-        }), 201
+        logger.info("Database insert successful")
+
+        return True, None
 
     except Error as e:
         logger.error(f"Error inserting stock: {e}")
