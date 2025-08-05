@@ -9,6 +9,7 @@ import {
     fetchCurrentPrice,
     fetchTransactions,
 } from '../api/stocks'
+import TotalPortfolioBalance from '../components/TotalPortfolioBalance'
 
 function Home() {
     const [selectedUserStock, setSelectedUserStock] = useState('AAPL')
@@ -61,11 +62,12 @@ function Home() {
 
     return (
         <div className="internal-tab home-tab">
+            <TotalPortfolioBalance />
             <div style={{ display: 'flex' }}>
                 <PieChart handleStockSelection={setSelectedUserStock} />
                 <LineGraph selectedUserStock={selectedUserStock} />
             </div>
-            <div>
+            <div style={{ marginTop: 30 }}>
                 <UserStocksTable handleStockSelection={setSelectedUserStock} />
             </div>
         </div>

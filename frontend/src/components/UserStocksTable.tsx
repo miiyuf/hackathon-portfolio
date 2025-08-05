@@ -1,5 +1,5 @@
 import * as React from 'react'
-import { useState, useEffect, type Dispatch, type SetStateAction } from 'react'
+import { useState, type Dispatch, type SetStateAction } from 'react'
 import { alpha } from '@mui/material/styles'
 import { useTradingContext } from '../GlobalContext'
 import {
