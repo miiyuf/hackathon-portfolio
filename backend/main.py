@@ -6,7 +6,7 @@ from apscheduler.schedulers.background import BackgroundScheduler
 import atexit
 from flask_cors import CORS
 from decimal import Decimal
-from datetime import datetime  # 追加
+from datetime import datetime  # added
 
 # Blueprint imports
 from app.main.controller.routes import stockget_bp, stockinsert_bp, holdings_bp, transaction_bp, price_bp, portfolio_bp, profitloss_bp
