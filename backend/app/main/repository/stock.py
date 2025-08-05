@@ -65,6 +65,9 @@ def insert_stock(data):
         logger.error(f"Invalid action: {data['action']}")
         return jsonify({"error": "Action must be either 'buy' or 'sell"}), 400
 
+    # Set flag for user-provided price
+    is_price_user_provided = 'purchase_price' in data
+
     # Auto-fetch price if not provided (after required field validation)
     if 'purchase_price' not in data:
         logger.info(f"No purchase price provided for {data['symbol']}, fetching from Yahoo Finance")
@@ -94,13 +97,14 @@ def insert_stock(data):
     logger.info(f"Getting stock name for {data['symbol']}")
     name = get_stock_name_from_ticker(data['symbol'])
     if not name:
-        logger.error(f"Could not retrieve name for {data['symbol']}")
-        raise ValueError(f"Could not retrieve name for {data['symbol']}")
+        logger.warning(f"Could not retrieve name for {data['symbol']}")
+        name = data['symbol']
+        # return jsonify({"error": f"Could not retrieve stock information for {data['symbol']}"}), 400
         
     logger.info(f"Inserting symbol-name pair: {data['symbol']} - {name}")
     insert_stock_symbol_pair_if_not_exists(data['symbol'], name)
     
-    price_source = "user_provided" if 'purchase_price' in data else "yahoo_finance"
+    price_source = "user_provided" if is_price_user_provided else "yahoo_finance"
     logger.info(f"Stock inserted successfully. Price source: {price_source}")
     return jsonify({
         "message": "Stock inserted successfully",
