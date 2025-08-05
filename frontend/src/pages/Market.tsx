@@ -1,7 +1,7 @@
 import React from 'react'
 
-function Trade() {
+function Market() {
     return <div className="internal-tab">DISPLAY STOCKS HERE</div>
 }
 
-export default Trade
+export default Market

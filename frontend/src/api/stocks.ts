@@ -55,6 +55,7 @@ export const fetchCurrentPrice = async (symbol: string): Promise<number> => {
 export interface TransactionData {
     id: number
     symbol: string
+    name: string
     action: 'buy' | 'sell'
     quantity: number
     purchase_price: number

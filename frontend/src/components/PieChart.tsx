@@ -5,7 +5,8 @@ import React, {
     type SetStateAction,
 } from 'react'
 import { PieChart as MuiPieChart } from '@mui/x-charts'
-import { useUserStocksContext } from '../GlobalContext'
+import { useUserStocksContext } from '../contexts/UserStocksContext'
+import { useSelectedStockContext } from '../contexts/SelectedStockContext'
 import { ToggleButtonGroup, ToggleButton } from '@mui/material'
 
 interface pieChartData {
@@ -16,8 +17,10 @@ interface pieChartData {
 interface PieChartProps {
     handleStockSelection: Dispatch<SetStateAction<string>>
 }
-function PieChart(props: PieChartProps) {
-    const { handleStockSelection } = props
+function PieChart() {
+    // const { handleStockSelection } = props
+    const { selectedStockState, selectedStockDispatch } =
+        useSelectedStockContext()
     const { userStocksState } = useUserStocksContext()
     const [totalStocksValue, setTotalStocksValue] = useState(1)
     const [pieChartView, setPieChartView] = useState('individualHoldings')
@@ -99,7 +102,11 @@ function PieChart(props: PieChartProps) {
                 ]}
                 onItemClick={(e, d) => {
                     let index = d.dataIndex
-                    handleStockSelection(pieChartData[index].label)
+                    // handleStockSelection(pieChartData[index].label)
+                    selectedStockDispatch({
+                        type: 'SELECT_STOCK',
+                        state: { selectedStock: pieChartData[index].label },
+                    })
                 }}
                 width={200}
                 height={300}

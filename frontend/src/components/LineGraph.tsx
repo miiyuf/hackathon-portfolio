@@ -1,14 +1,15 @@
 import React from 'react'
 import { useState, useEffect } from 'react'
 import { LineChart, lineElementClasses } from '@mui/x-charts/LineChart'
+import { useSelectedStockContext } from '../contexts/SelectedStockContext'
 import { ToggleButton, ToggleButtonGroup } from '@mui/material'
+
+const uData = [1000, 2800, 1050, 1890, 1505, 3800]
 const xLabels = ['Jul 1', 'Jul 7', 'Jul 14', 'Jul 21', 'Jul 28', 'Today']
 
-interface LineGraphProps {
-    selectedUserStock: string
-}
-function LineGraph(props: LineGraphProps) {
-    const { selectedUserStock } = props
+function LineGraph() {
+    const { selectedStockState, selectedStockDispatch } =
+        useSelectedStockContext()
     const [lineGraphData, setLineGraphData] = useState<number[]>([])
     const [lineChartView, setLineChartView] = useState('stock')
     const handleLineChartViewChange = (
@@ -35,7 +36,7 @@ function LineGraph(props: LineGraphProps) {
                 series={[
                     {
                         data: lineGraphData,
-                        label: `${selectedUserStock}`,
+                        label: `${selectedStockState.selectedStock}`,
                         area: true,
                         showMark: false,
                         color: 'rgba(28, 144, 30, 0.5)',
