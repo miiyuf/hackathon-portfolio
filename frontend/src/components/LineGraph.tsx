@@ -15,7 +15,7 @@ function LineGraph() {
                 series={[
                     {
                         data: uData,
-                        label: `${selectedStockState}`,
+                        label: `${selectedStockState.selectedStock}`,
                         area: true,
                         showMark: false,
                         color: 'rgba(28, 144, 30, 0.5)',

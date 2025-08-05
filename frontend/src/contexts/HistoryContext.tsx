@@ -14,7 +14,7 @@ export interface HistoryState {
 
 interface HistoryContextType {
     historyState: HistoryState[]
-    historyDispatch: React.Dispatch<{
+    historyDispatch?: React.Dispatch<{
         type: string
         state: HistoryState[]
     }>

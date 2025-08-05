@@ -186,9 +186,6 @@ function EnhancedTableToolbar(props: EnhancedTableToolbarProps) {
     )
 }
 
-interface UserStocksTableProps {
-    handleStockSelection: Dispatch<SetStateAction<string>>
-}
 export default function UserStocksTable() {
     // const { handleStockSelection } = props
     const { selectedStockState, selectedStockDispatch } =
