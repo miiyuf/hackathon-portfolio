@@ -32,7 +32,7 @@ def fetch_holdings(include_purchase_price=False):
                 SELECT 
                     symbol,
                     SUM(CASE WHEN action = 'buy' THEN quantity ELSE -quantity END) AS total_quantity
-                FROM stocks
+                FROM portfolio
                 GROUP BY symbol
                 HAVING total_quantity > 0
             ) AS total
@@ -41,11 +41,11 @@ def fetch_holdings(include_purchase_price=False):
                     symbol,
                     SUM(purchase_price * quantity) AS total_buy_value,
                     SUM(quantity) AS total_buy_quantity
-                FROM stocks
+                FROM portfolio
                 WHERE action = 'buy'
                 GROUP BY symbol
             ) AS buy ON total.symbol = buy.symbol
-            LEFT JOIN stock_master sm ON total.symbol = sm.symbol;
+            LEFT JOIN portfolio_master sm ON total.symbol = sm.symbol;
         """
         logger.info("Including purchase price in the query.")
     else:
@@ -54,8 +54,8 @@ def fetch_holdings(include_purchase_price=False):
                 s.symbol,
                 sm.name,
                 SUM(CASE WHEN s.action = 'buy' THEN s.quantity ELSE -s.quantity END) AS total_quantity
-            FROM stocks s
-            LEFT JOIN stock_master sm ON s.symbol = sm.symbol
+            FROM portfolio s
+            LEFT JOIN portfolio_master sm ON s.symbol = sm.symbol
             GROUP BY s.symbol, sm.name
             HAVING total_quantity > 0;
         """

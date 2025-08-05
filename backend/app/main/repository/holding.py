@@ -19,8 +19,8 @@ def get_holdings():
     SELECT s.symbol, sm.name, 
         SUM(CASE WHEN s.action = 'buy' THEN s.quantity ELSE -s.quantity END) AS total_quantity, 
         avg(CASE WHEN s.action='buy' THEN s.purchase_price ELSE NULL END) as cost_price 
-    FROM stocks s 
-    LEFT JOIN stock_master sm ON s.symbol = sm.symbol 
+    FROM portfolio s 
+    LEFT JOIN portfolio_master sm ON s.symbol = sm.symbol 
     GROUP BY s.symbol, sm.name
     HAVING total_quantity > 0;
     """

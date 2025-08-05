@@ -12,7 +12,7 @@ def update_current_prices():
         return
 
     cursor = conn.cursor(dictionary=True)
-    cursor.execute("SELECT DISTINCT symbol FROM stocks;")
+    cursor.execute("SELECT DISTINCT symbol FROM portfolio;")
     symbols = cursor.fetchall()
 
     for record in symbols:
@@ -22,7 +22,7 @@ def update_current_prices():
             print(f"Failed to fetch price for {symbol}.")
             continue
         try:
-            update_query = "UPDATE stocks SET current_price = %s WHERE symbol = %s;"
+            update_query = "UPDATE portfolio SET current_price = %s WHERE symbol = %s;"
             cursor.execute(update_query, (current_price, symbol))
             conn.commit()
             print(f"Updated price for {symbol}: {current_price}")

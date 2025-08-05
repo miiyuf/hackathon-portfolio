@@ -72,7 +72,7 @@ def fetch_holdings(include_purchase_price=False):
         SELECT symbol, name, 
             SUM(CASE WHEN action = 'buy' THEN quantity ELSE -quantity END) AS total_quantity
         {purchase_price_column}
-        FROM stocks
+        FROM portfolio
         GROUP BY symbol, name {purchase_price_group}
         HAVING total_quantity > 0;
     """.format(
@@ -98,7 +98,7 @@ def fetch_holdings(include_purchase_price=False):
 #         return conn
 
 #     cursor = conn.cursor(dictionary=True)
-#     cursor.execute("SELECT * FROM stocks;")
+#     cursor.execute("SELECT * FROM portfolio;")
 #     results = cursor.fetchall()
 #     cursor.close()
 #     conn.close()
@@ -162,7 +162,7 @@ def fetch_holdings(include_purchase_price=False):
 #         return conn
 
 #     cursor = conn.cursor(dictionary=True)
-#     cursor.execute("SELECT * FROM stocks ORDER BY id DESC;")
+#     cursor.execute("SELECT * FROM portfolio ORDER BY id DESC;")
 #     results = cursor.fetchall()
 #     cursor.close()
 #     conn.close()
@@ -248,7 +248,7 @@ def update_current_prices():
         return
 
     cursor = conn.cursor(dictionary=True)
-    cursor.execute("SELECT DISTINCT symbol FROM stocks;")
+    cursor.execute("SELECT DISTINCT symbol FROM portfolio;")
     symbols = cursor.fetchall()
 
     for record in symbols:
