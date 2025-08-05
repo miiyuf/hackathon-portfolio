@@ -6,7 +6,7 @@ import React, {
 } from 'react'
 import { PieChart as MuiPieChart } from '@mui/x-charts'
 import { useUserStocksContext } from '../GlobalContext'
-import { ToggleButtonGroup, ToggleButton } from '@mui/material'
+import { ToggleButtonGroup, ToggleButton, Paper } from '@mui/material'
 
 interface pieChartData {
     id: number
@@ -83,7 +83,7 @@ function PieChart(props: PieChartProps) {
         }
     }, [pieChartView, userStocksState])
     return (
-        <div>
+        <Paper sx={{ padding: 2, borderRadius: 4 }}>
             <MuiPieChart
                 series={[
                     {
@@ -129,7 +129,7 @@ function PieChart(props: PieChartProps) {
                     industry
                 </ToggleButton>
             </ToggleButtonGroup>
-        </div>
+        </Paper>
     )
 }
 

@@ -278,7 +278,15 @@ function UserHistoryTable() {
         setPage(0)
     }
     return (
-        <Paper sx={{ width: '100%', overflow: 'hidden' }}>
+        <Paper
+            sx={{
+                width: '100%',
+                overflow: 'hidden',
+                borderRadius: 4,
+                boxShadow: 2,
+            }}
+            elevation={0}
+        >
             <TableContainer sx={{ maxHeight: 440 }}>
                 <Table stickyHeader aria-label="sticky table">
                     <TableHead>

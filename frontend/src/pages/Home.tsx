@@ -13,59 +13,16 @@ import {
 function Home() {
     const [selectedUserStock, setSelectedUserStock] = useState('AAPL')
 
-    // TEST CODE TO CHECK ENDPOINTS
-    // useEffect(() => {
-    //     const testFetch = async () => {
-    //         try {
-    //             const data = await fetchPortfolioData()
-    //             console.log('Portfolio data:', data)
-    //         } catch (error) {
-    //             console.error('Error fetching portfolio data:', error)
-    //         }
-    //     }
-    //     const testFetchPrice = async () => {
-    //         try {
-    //             const data = await fetchCurrentPrice('AAPL')
-    //             console.log(data)
-    //             return data
-    //         } catch (error) {
-    //             console.error('Error fetching portfolio data:', error)
-    //         }
-    //     }
-    //     const testTransactions = async () => {
-    //         try {
-    //             const data = await fetchTransactions()
-    //             console.log(data)
-    //             return data
-    //         } catch (error) {
-    //             console.error('Error fetching portfolio data:', error)
-    //         }
-    //     }
-    //     // const testAddStock = async () => {
-    //     //     try {
-    //     //         const res = await addStockTransaction({
-    //     //             symbol: 'AAPL',
-    //     //             purchase_price: 180,
-    //     //             action: 'buy',
-    //     //             quantity: 20,
-    //     //         })
-    //     //         return res
-    //     //     } catch (error) {
-    //     //         console.error('Error adding stock transaction:', error)
-    //     //     }
-    //     // }
-    //     testFetch()
-    //     // testAddStock()
-    //     // testTransactions()
-    // }, [])
-
     return (
-        <div className="internal-tab home-tab">
-            <div style={{ display: 'flex' }}>
+        <div
+            className="internal-tab home-tab"
+            style={{ paddingTop: 60, width: 1050 }}
+        >
+            <div style={{ display: 'flex', justifyContent: 'space-between' }}>
                 <PieChart handleStockSelection={setSelectedUserStock} />
                 <LineGraph selectedUserStock={selectedUserStock} />
             </div>
-            <div>
+            <div style={{ display: 'flex' }}>
                 <UserStocksTable handleStockSelection={setSelectedUserStock} />
             </div>
         </div>

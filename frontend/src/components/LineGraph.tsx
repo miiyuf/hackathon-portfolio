@@ -1,5 +1,6 @@
 import React from 'react'
 import { LineChart, lineElementClasses } from '@mui/x-charts/LineChart'
+import { Paper } from '@mui/material'
 const uData = [1000, 2800, 1050, 1890, 1505, 3800]
 const xLabels = ['Jul 1', 'Jul 7', 'Jul 14', 'Jul 21', 'Jul 28', 'Today']
 
@@ -9,10 +10,10 @@ interface LineGraphProps {
 function LineGraph(props: LineGraphProps) {
     const { selectedUserStock } = props
     return (
-        <div>
+        <Paper sx={{ borderRadius: 4, boxShadow: 2 }} elevation={0}>
             <LineChart
                 height={300}
-                width={650}
+                width={600}
                 series={[
                     {
                         data: uData,
@@ -29,7 +30,7 @@ function LineGraph(props: LineGraphProps) {
                     },
                 }}
             />
-        </div>
+        </Paper>
     )
 }
 

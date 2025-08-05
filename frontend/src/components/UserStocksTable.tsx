@@ -280,7 +280,10 @@ export default function UserStocksTable(props: UserStocksTableProps) {
 
     return (
         <Box sx={{ width: '100%', paddingTop: 3 }}>
-            <Paper sx={{ width: '100%', mb: 2 }}>
+            <Paper
+                sx={{ width: '100%', mb: 2, borderRadius: 3, boxShadow: 2 }}
+                elevation={0}
+            >
                 <EnhancedTableToolbar
                     numSelected={selectedId === -1 ? 0 : 1}
                     handleUserOpen={handleUserOpen}
