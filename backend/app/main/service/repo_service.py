@@ -61,6 +61,8 @@ def insert_stock(data):
         name = data['symbol']  # Fallback to symbol if name retrieval fails
     
     # Call repository layer
+    # NOTE: All validation is performed in the service layer above.
+    # The repository layer (insert_stock_record) should not duplicate validation logic.
     success, db_error = stock.insert_stock_record(data)
     if not success:
         return {"error": f"Database error: {db_error}"}, 500
