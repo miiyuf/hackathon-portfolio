@@ -64,9 +64,9 @@ function Sidebar() {
                     </ListItemButton>
                 </ListItem>
                 <ListItem
-                    key={'trade'}
+                    key={'market'}
                     disablePadding
-                    onClick={() => navigate('/trade')}
+                    onClick={() => navigate('/Market')}
                 >
                     <ListItemButton>
                         <ListItemIcon>
