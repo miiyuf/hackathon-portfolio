@@ -98,7 +98,7 @@ def insert_stock(data):
         return jsonify({
             "message": "Stock inserted successfully",
             "used_price": data['purchase_price'],
-            "price_source": "user_provided" if 'purchase_price' in request.get_json() else "yahoo_finance"
+            "price_source": "user_provided" if 'purchase_price' in data else "yahoo_finance"
         }), 201
     except Error as e:
         logger.error(f"Error inserting stock: {e}")
