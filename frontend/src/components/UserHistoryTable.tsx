@@ -10,7 +10,9 @@ import {
     TableRow,
     TablePagination,
     TableSortLabel,
-    Box
+    Box,
+    Chip,
+    Typography
 } from '@mui/material'
 import { visuallyHidden } from '@mui/utils'
 import { useHistoryContext } from '../contexts/HistoryContext'
@@ -22,6 +24,23 @@ function UserHistoryTable() {
     const { historyState, historyDispatch } = useHistoryContext()
     const [order, setOrder] = useState<Order>('desc')
     const [orderBy, setOrderBy] = useState<keyof TransactionHistory>('date')
+    const [companyFilter, setCompanyFilter] = useState<string | null>(null)
+    const [actionFilter, setActionFilter] = useState<string | null>(null) // Action用のフィルター状態を追加
+
+    const handleCompanyClick = (company: string) => {
+        setCompanyFilter(currentFilter => currentFilter === company ? null : company)
+        setPage(0)
+    }
+
+    const handleClearFilters = () => {
+        setCompanyFilter(null)
+        setActionFilter(null)
+    }
+
+    const handleActionClick = (action: string) => {
+        setActionFilter(currentFilter => currentFilter === action ? null : action)
+        setPage(0)
+    }
 
     interface Column {
         id:
@@ -137,12 +156,54 @@ function UserHistoryTable() {
         setPage(0)
     }
 
-    const sortedData = React.useMemo(() => {
-        return [...historyState].sort(getComparator(order, orderBy))
-    }, [historyState, order, orderBy])
+    const filteredAndSortedData = React.useMemo(() => {
+        let data = [...historyState];
+        
+        if (companyFilter) {
+            data = data.filter(item => item.company === companyFilter);
+        }
+        
+        if (actionFilter) {
+            data = data.filter(item => item.action === actionFilter);
+        }
+        
+        return data.sort(getComparator(order, orderBy));
+    }, [historyState, order, orderBy, companyFilter, actionFilter]);
 
     return (
         <Paper sx={{ width: '100%', overflow: 'hidden' }}>
+            {(companyFilter || actionFilter) && (
+                <Box sx={{ p: 1, display: 'flex', alignItems: 'center', backgroundColor: 'rgba(0, 0, 255, 0.05)' }}>
+                    <Typography variant="body2" sx={{ mr: 1 }}>Filtered by:</Typography>
+                    {companyFilter && (
+                        <Chip 
+                            label={`Company: ${companyFilter}`}
+                            onDelete={() => setCompanyFilter(null)}
+                            color="primary"
+                            size="small"
+                            sx={{ mr: 1 }}
+                        />
+                    )}
+                    {actionFilter && (
+                        <Chip 
+                            label={`Action: ${actionFilter}`}
+                            onDelete={() => setActionFilter(null)}
+                            color="secondary"
+                            size="small"
+                            sx={{ mr: 1 }}
+                        />
+                    )}
+                    {(companyFilter && actionFilter) && (
+                        <Chip 
+                            label="Clear All"
+                            onDelete={handleClearFilters}
+                            color="default"
+                            size="small"
+                        />
+                    )}
+                </Box>
+            )}
+            
             <TableContainer sx={{ maxHeight: 440 }}>
                 <Table stickyHeader aria-label="sticky table">
                     <TableHead>
@@ -184,7 +245,7 @@ function UserHistoryTable() {
                         </TableRow>
                     </TableHead>
                     <TableBody>
-                        {sortedData
+                        {filteredAndSortedData
                             .slice(
                                 page * rowsPerPage,
                                 page * rowsPerPage + rowsPerPage
@@ -198,7 +259,48 @@ function UserHistoryTable() {
                                         key={row.id}
                                     >
                                         {columns.map((column) => {
-                                            const value = row[column.id]
+                                            const value = row[column.id];
+                                            
+                                            if (column.id === 'company') {
+                                                return (
+                                                    <TableCell
+                                                        key={column.id}
+                                                        align={column.align}
+                                                        onClick={() => handleCompanyClick(value as string)}
+                                                        sx={{
+                                                            cursor: 'pointer',
+                                                            fontWeight: companyFilter === value ? 'bold' : 'normal',
+                                                            backgroundColor: companyFilter === value ? 'rgba(0, 0, 255, 0.1)' : 'inherit',
+                                                            '&:hover': {
+                                                                backgroundColor: 'rgba(0, 0, 255, 0.05)'
+                                                            }
+                                                        }}
+                                                    >
+                                                        {value}
+                                                    </TableCell>
+                                                );
+                                            }
+                                            
+                                            if (column.id === 'action') {
+                                                return (
+                                                    <TableCell
+                                                        key={column.id}
+                                                        align={column.align}
+                                                        onClick={() => handleActionClick(value as string)}
+                                                        sx={{
+                                                            cursor: 'pointer',
+                                                            fontWeight: actionFilter === value ? 'bold' : 'normal',
+                                                            backgroundColor: actionFilter === value ? 'rgba(76, 175, 80, 0.1)' : 'inherit',
+                                                            '&:hover': {
+                                                                backgroundColor: 'rgba(76, 175, 80, 0.05)'
+                                                            }
+                                                        }}
+                                                    >
+                                                        {value}
+                                                    </TableCell>
+                                                );
+                                            }
+                                            
                                             return (
                                                 <TableCell
                                                     key={column.id}
@@ -220,7 +322,7 @@ function UserHistoryTable() {
             <TablePagination
                 rowsPerPageOptions={[10, 25, 100]}
                 component="div"
-                count={historyState.length}
+                count={filteredAndSortedData.length}
                 rowsPerPage={rowsPerPage}
                 page={page}
                 onPageChange={handleChangePage}
