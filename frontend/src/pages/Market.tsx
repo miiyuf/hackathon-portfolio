@@ -148,7 +148,7 @@ function Market() {
     return (
         <div className="internal-tab">
             <Typography variant="h4" gutterBottom sx={{ fontWeight: 'bold', mb: 3 }}>
-                Top Companies
+                Tokyo Stock Exchange Market
             </Typography>
 
             {loading ? (
