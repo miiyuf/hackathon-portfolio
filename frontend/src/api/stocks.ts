@@ -73,7 +73,7 @@ export const fetchTransactions = async (): Promise<TransactionData[]> => {
 }
 
 export interface PortfolioData {
-    holdings: []
+    holdings: HoldingData[]
     total_net_investment: string
     total_portfolio_balance: string
 }
