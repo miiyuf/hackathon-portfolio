@@ -63,8 +63,6 @@ CREATE TABLE `transactions` (
 ) ENGINE=InnoDB AUTO_INCREMENT=4 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
-ALTER TABLE `transactions`
-ADD COLUMN `created_at` datetime NOT NULL DEFAULT CURRENT_TIMESTAMP;
 /*!40103 SET TIME_ZONE=@OLD_TIME_ZONE */;
 
 /*!40101 SET SQL_MODE=@OLD_SQL_MODE */;
