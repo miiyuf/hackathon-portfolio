@@ -133,6 +133,32 @@ function TradingAction() {
         }
     }
 
+    const sellStock = async () => {
+        try {
+            const sellingPrice = await getCurrentPrice(
+                tradingModalState.symbol || ''
+            )
+            console.log('selling price:', sellingPrice)
+            if (tradingModalState.symbol && sellingPrice) {
+                const newStock: StockTransaction = {
+                    symbol: tradingModalState.symbol!,
+                    purchase_price: sellingPrice!,
+                    action: 'sell',
+                    quantity: Number(quantity),
+                }
+                const res = await addStockTransaction(newStock)
+                console.log('Sell stock response:', res)
+            } else {
+                alert('Please enter all fields')
+                return
+            }
+        } catch (error) {
+            console.log('Error selling stock: ', error)
+        } finally {
+            handleClose()
+        }
+    }
+
     useEffect(() => {
         if (action === 'Buy' || action === 'Sell') {
             setButtonText(action)
@@ -240,7 +266,7 @@ function TradingAction() {
                                     action === 'Buy'
                                         ? buyStock
                                         : () => {
-                                              console.log('sell')
+                                              sellStock();
                                           }
                                 }
                                 variant="contained"
