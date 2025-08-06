@@ -14,6 +14,7 @@ import {
 import { useTradingContext } from '../contexts/TradingContext'
 import {
     fetchCurrentPrice,
+    fetchHoldingsQuantity,
     addStockTransaction,
     type StockTransaction,
 } from '../api/stocks'
@@ -101,6 +102,16 @@ function TradingAction() {
         }
     }
 
+    const getHoldingQuantity = async (symbol: string) => {
+        try {
+            const holdingsQuantity = await fetchHoldingsQuantity(symbol)
+            return holdingsQuantity
+        } catch (error) {
+            console.error('Error fetching holdings quantity:', error)
+            return 0
+        }
+    }
+
     const buyStock = async () => {
         try {
             const buyingPrice = await getCurrentPrice(
@@ -138,6 +149,14 @@ function TradingAction() {
             const sellingPrice = await getCurrentPrice(
                 tradingModalState.symbol || ''
             )
+            const holdingQuantity = await getHoldingQuantity(
+                tradingModalState.symbol || ''
+            )
+            if (Number(quantity) > holdingQuantity) {
+                alert(`You cannot sell more than you own. You currently own ${holdingQuantity} shares of ${tradingModalState.symbol}.`)
+                return
+            }
+            
             console.log('selling price:', sellingPrice)
             if (tradingModalState.symbol && sellingPrice) {
                 const newStock: StockTransaction = {
