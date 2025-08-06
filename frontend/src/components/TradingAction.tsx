@@ -18,12 +18,15 @@ import {
     type StockTransaction,
 } from '../api/stocks'
 import { useSelectedStockContext } from '../contexts/SelectedStockContext'
-import { getPortfolioBalance } from '../contexts/PortfolioBalanceContext'
-import { usePortfolioBalanceContext } from '../contexts/PortfolioBalanceContext'
 import { updateUserStocks } from '../contexts/UserStocksContext'
 import { useUserStocksContext } from '../contexts/UserStocksContext'
 import { useHistoryContext } from '../contexts/HistoryContext'
 import { fetchTransactionHistory } from '../contexts/HistoryContext'
+import {
+    updatePortfolioBalance,
+    updatePortfolioInvestment,
+    usePortfolioInfoContext,
+} from '../contexts/PortfolioInfoContext'
 
 function TradingAction() {
     const { tradingModalState, tradingModalDispatch } = useTradingContext()
@@ -31,8 +34,8 @@ function TradingAction() {
 
     const { selectedStockState, selectedStockDispatch } =
         useSelectedStockContext()
-    const { portfolioBalanceState, portfolioBalanceDispatch } =
-        usePortfolioBalanceContext()
+    const { portfolioInfoState, portfolioInfoDispatch } =
+        usePortfolioInfoContext()
     const { historyState, historyDispatch } = useHistoryContext()
 
     const handleOpen = () => {
@@ -111,7 +114,6 @@ function TradingAction() {
                     quantity: Number(quantity),
                 }
                 const res = await addStockTransaction(newStock)
-                console.log(res)
             } else {
                 alert('Please enter all fields')
                 return
@@ -119,8 +121,9 @@ function TradingAction() {
         } catch (error) {
             console.log('Error buying stock: ', error)
         } finally {
-            // update total portfolio balance
-            getPortfolioBalance(portfolioBalanceDispatch)
+            // update total portfolio balance & investment
+            updatePortfolioBalance(portfolioInfoDispatch)
+            updatePortfolioInvestment(portfolioInfoDispatch)
             // update user stocks
             updateUserStocks(userStocksDispatch)
             // update history

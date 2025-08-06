@@ -6,7 +6,7 @@ import './Home.css'
 function History() {
     return (
         <div className="internal-tab">
-            <Typography variant="h5">History</Typography>
+            <Typography variant="h5">Transactions</Typography>
             <UserHistoryTable />
         </div>
     )
