@@ -1,12 +1,8 @@
-<<<<<<< Updated upstream
 import { TradingContextProvider } from './contexts/TradingContext'
 import { UserStocksProvider } from './contexts/UserStocksContext'
 import { SelectedStockProvider } from './contexts/SelectedStockContext'
 import { HistoryProvider } from './contexts/HistoryContext'
 import { PortfolioBalanceProvider } from './contexts/PortfolioInfoContext'
-
-export function GlobalProvider({ children }: { children: React.ReactNode }) {
-=======
 import { createContext, useReducer, useContext, useEffect } from 'react'
 import { fetchPortfolioData } from './api/stocks'
 
