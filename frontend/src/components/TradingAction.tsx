@@ -149,7 +149,7 @@ function TradingAction() {
                 const res = await addStockTransaction(newStock)
                 console.log('Sell stock response:', res)
             } else {
-                alert('Please enter all fields')
+                alert('Unable to fetch current price for selling')
                 return
             }
         } catch (error) {
