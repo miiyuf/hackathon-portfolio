@@ -22,7 +22,7 @@ def get_holdings():
     
     results = holding.get_holdings()
     
-    logger.info(f"get_holdings() completed in {time.time() - start_time:.2f}s - Retrieved {len(results)} records")
+    logger.info(f"get_holdings() completed in {time.time() - start_time:.2f}s")
     return results
 
 def insert_stock(data):
@@ -125,7 +125,6 @@ def get_transactions():
     start_time = time.time()
     
     results = transaction.get_transactions()
-    logger.info(results)
     logger.info(f"get_transactions() completed in {time.time() - start_time:.2f}s") # Retrieved {len(results)} transactions")
     return results
 

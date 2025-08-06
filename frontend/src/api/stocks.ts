@@ -51,7 +51,9 @@ export const fetchCurrentPrice = async (symbol: string): Promise<number> => {
     }
 }
 
-export const fetchHoldingsQuantity = async (symbol: string): Promise<number> => {
+export const fetchHoldingsQuantity = async (
+    symbol: string
+): Promise<number> => {
     try {
         const response = await API.get(`/api/holdings`)
         const holdings = response.data

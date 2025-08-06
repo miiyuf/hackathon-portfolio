@@ -29,4 +29,4 @@ def get_holdings():
     cursor.close()
     conn.close()
 
-    return jsonify(results)
+    return results
