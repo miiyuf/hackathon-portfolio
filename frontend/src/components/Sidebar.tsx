@@ -39,7 +39,7 @@ function Sidebar() {
                         letterSpacing: '0.5px'
                     }}
                 >
-                    Portex
+                    📈Portex
                 </Typography>
             </Toolbar>
             <Divider />
