@@ -4,9 +4,9 @@ import logging
 import time
 
 logger = logging.getLogger(__name__)
-price_bp = Blueprint('price', __name__, url_prefix='/api')
+currentprice_bp = Blueprint('price', __name__, url_prefix='/api')
 
-@price_bp.route('/current-prices', methods=['GET'])
+@currentprice_bp.route('/current-prices', methods=['GET'])
 def get_current_prices():
     """
     Get all current stock prices from the database

@@ -11,8 +11,8 @@ from app.main.repository.update import update_current_prices
 
 
 # Blueprint imports
-from app.main.controller.routes import stockget_bp, stockinsert_bp, holdings_bp, transaction_bp, portfolio_bp, profitloss_bp
-from app.main.controller.price import price_bp
+from app.main.controller.routes import stockget_bp, stockinsert_bp, holdings_bp, transaction_bp, portfolio_bp, profitloss_bp, price_bp
+from app.main.controller.price import currentprice_bp
 
 # Load .env file
 load_dotenv()
