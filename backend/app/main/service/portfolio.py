@@ -68,8 +68,6 @@ def get_portfolio():
             # Add current market value to total balance
             total_portfolio_balance += market_value
             
-            # Verify that total_portfolio_balance has been updated here
-            logger.debug(f"Added {market_value} to portfolio balance, new total: {total_portfolio_balance}")
             
             # Calculate unrealized profit/loss
             unrealized_pl = market_value - net_investment
