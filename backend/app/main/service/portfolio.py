@@ -90,7 +90,12 @@ def get_portfolio():
     response_data = {
         'total_net_investment': str(total_net_investment),
         'total_portfolio_balance': str(total_portfolio_balance),
-        'holdings': detailed_holdings
+        'holdings': detailed_holdings,
+        'stats': {
+            'total_holdings': len(holdings),
+            'price_fetch_success_count': success_price_fetch_count,
+            'price_fetch_success_rate': f"{(success_price_fetch_count / len(holdings) * 100):.1f}%" if holdings else "0%"
+        }
     }
     logger.info("Portfolio data preparation completed.")
 
