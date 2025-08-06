@@ -1,5 +1,5 @@
 import { Typography } from '@mui/material'
-import { useEffect, useState } from 'react'
+import { useEffect } from 'react'
 
 import {
     updatePortfolioInvestment,
@@ -29,12 +29,12 @@ function TotalPortfolioInfo() {
                     alignItems: 'center',
                 }}
             >
-                <Typography 
+                <Typography
                     variant="h4"
-                    sx={{ 
+                    sx={{
                         fontFamily: 'Gotham, sans-serif',
                         fontWeight: 'bold',
-                        letterSpacing: '0.5px'
+                        letterSpacing: '0.5px',
                     }}
                 >
                     Total Portfolio Balance:{' '}
@@ -57,16 +57,21 @@ function TotalPortfolioInfo() {
                         <TrendingDownIcon style={{ color: 'red' }} />
                     )}
                 </div>
+                <div>
+                    <Typography pl={2} variant="h4">
+                        (%x)
+                    </Typography>
+                </div>
             </div>
 
-            <Typography 
-                variant="h5" 
-                color="gray" 
+            <Typography
+                variant="h5"
+                color="gray"
                 mt={1}
-                sx={{ 
+                sx={{
                     fontFamily: 'Gotham, sans-serif',
                     fontWeight: 'bold',
-                    letterSpacing: '0.5px'
+                    letterSpacing: '0.5px',
                 }}
             >
                 Total Portfolio Investment: $

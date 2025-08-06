@@ -15,12 +15,13 @@ def get_stocks():
     logger.info(f"get_stocks() completed in {time.time() - start_time:.2f}s - Retrieved {len(results)} records")
     return results
 
-def get_holdings():
+def get_holdings(day=None):
     """Get all holdings from the database"""
     logger.info("Starting get_holdings() service function")
     start_time = time.time()
     
-    results = holding.get_holdings()
+    results = holding.get_holdings(day)
+    logger.info(results)
     
     logger.info(f"get_holdings() completed in {time.time() - start_time:.2f}s")
     return results

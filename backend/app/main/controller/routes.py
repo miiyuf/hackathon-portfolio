@@ -81,9 +81,10 @@ def get_long_stock_price(symbol):
     return result
 
 
-@price_bp.route('/long_term_balance', methods=['GET'])
-def get_long_term_balance():
-    result = Price.get_long_term_balance()
+@price_bp.route('/long_term_balance/<days>', methods=['GET'])
+def get_long_term_balance(days):
+    num_days = int(days)
+    result = Price.get_long_term_balance(num_days)
     if result is None:
         return jsonify({"error": "Could not fetch long-term balance"}), 500
     return result
