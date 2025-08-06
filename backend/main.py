@@ -6,11 +6,13 @@ from apscheduler.schedulers.background import BackgroundScheduler
 import atexit
 from flask_cors import CORS
 from decimal import Decimal
-from datetime import datetime  # added
+from datetime import datetime
+from app.main.repository.update import update_current_prices
+
 
 # Blueprint imports
-from app.main.controller.routes import stockget_bp, stockinsert_bp, holdings_bp, transaction_bp, price_bp, portfolio_bp, profitloss_bp
-from app.main.service.repo_service import update_current_prices
+from app.main.controller.routes import stockget_bp, stockinsert_bp, holdings_bp, transaction_bp, portfolio_bp, profitloss_bp
+from app.main.controller.price import price_bp
 
 # Load .env file
 load_dotenv()
@@ -65,7 +67,7 @@ app.register_blueprint(profitloss_bp)
 
 # Background scheduler to update current prices every 5 minutes
 scheduler = BackgroundScheduler()
-scheduler.add_job(func=update_current_prices, trigger="interval", minutes=5)
+scheduler.add_job(func=update_current_prices, trigger="interval", seconds=30)
 scheduler.start()
 
 # Ensure the scheduler shuts down when the app exits
