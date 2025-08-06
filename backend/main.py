@@ -8,10 +8,12 @@ from flask_cors import CORS
 from decimal import Decimal
 from datetime import datetime
 from app.main.repository.update import update_current_prices
+from app.main.controller.routes import update_japan_stocks
+import os
 
 
 # Blueprint imports
-from app.main.controller.routes import stockget_bp, stockinsert_bp, holdings_bp, transaction_bp, portfolio_bp, profitloss_bp, price_bp
+from app.main.controller.routes import stockget_bp, stockinsert_bp, holdings_bp, transaction_bp, portfolio_bp, profitloss_bp, price_bp, update_top_stocks, top_stocks_bp, japan_stocks_bp
 from app.main.controller.price import currentprice_bp
 
 # Load .env file
@@ -65,13 +67,19 @@ app.register_blueprint(price_bp)
 app.register_blueprint(portfolio_bp)
 app.register_blueprint(profitloss_bp)
 app.register_blueprint(currentprice_bp)
+app.register_blueprint(top_stocks_bp)
+app.register_blueprint(japan_stocks_bp)
 
-# Background scheduler to update current prices every 5 minutes
+# Background scheduler to update current prices every 30 seconds
 scheduler = BackgroundScheduler()
 scheduler.add_job(func=update_current_prices, trigger="interval", seconds=30)
-scheduler.start()
+scheduler.add_job(func=update_top_stocks, trigger="interval", seconds=30)
+scheduler.add_job(func=update_japan_stocks, trigger="interval", seconds=30)
 
-# Ensure the scheduler shuts down when the app exits
+if os.environ.get("WERKZEUG_RUN_MAIN") == "true":
+    if not scheduler.running:
+        scheduler.start()
+
 atexit.register(lambda: scheduler.shutdown())
 
 if __name__ == '__main__':

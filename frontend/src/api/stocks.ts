@@ -1,8 +1,11 @@
 import axios from 'axios'
 
 const API = axios.create({
-    baseURL: import.meta.env.VITE_APP_API_URL, // || 'http://localhost:8000',
+    baseURL: import.meta.env.VITE_APP_API_URL,
 })
+
+export { API }
+
 export interface HoldingData {
     symbol: string
     name: string
