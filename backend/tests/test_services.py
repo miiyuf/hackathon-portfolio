@@ -49,8 +49,7 @@ def test_get_portfolio(mocker):
     with app.app_context():
         get_portfolio_response = get_portfolio()
         get_portfolio_response = get_portfolio_response.get_json()
-   
-
+    
     assert get_portfolio_response['total_net_investment'] == expected_detailed_holdings['total_net_investment']
     assert get_portfolio_response['holdings'][0]["symbol"] == expected_detailed_holdings['holdings'][0]['symbol']
     assert get_portfolio_response['holdings'][0]["name"] == expected_detailed_holdings['holdings'][0]['name']
