@@ -70,7 +70,7 @@ export interface TransactionData {
     action: 'buy' | 'sell'
     quantity: number
     purchase_price: number
-    transaction_date: string
+    created_at: string
 }
 
 export const fetchTransactions = async (): Promise<TransactionData[]> => {

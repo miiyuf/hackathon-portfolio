@@ -51,7 +51,7 @@ except (AttributeError, TypeError):
             if isinstance(obj, Decimal):
                 return float(obj)
             elif isinstance(obj, datetime):
-                return obj.isoformat()
+                return obj.strftime('%Y-%m-%d %H:%M:%S')
             return super(CustomJSONEncoder, self).default(obj)
 
     app.json_encoder = CustomJSONEncoder

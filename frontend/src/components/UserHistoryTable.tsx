@@ -73,7 +73,7 @@ function UserHistoryTable() {
         },
         {
             id: 'date',
-            label: 'Date',
+            label: 'Timestamp',
             minWidth: 100,
             align: 'left',
         },
