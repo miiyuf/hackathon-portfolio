@@ -18,12 +18,43 @@ import { visuallyHidden } from '@mui/utils'
 import { useHistoryContext } from '../contexts/HistoryContext'
 import { fetchTransactionHistory } from '../contexts/HistoryContext'
 
-type Order = 'asc' | 'desc'
+// ファイルの先頭あたりに列識別子の定数を追加
+const COLUMN_IDS = {
+  TICKER: 'ticker',
+  COMPANY: 'company',
+  QUANTITY: 'qty',
+  ACTION: 'action',
+  PURCHASE_PRICE: 'purchasePrice',
+  TOTAL_AMOUNT: 'totalAmount',
+  DATE: 'date',
+} as const;
+
+// 型の定義を修正
+type ColumnId = typeof COLUMN_IDS[keyof typeof COLUMN_IDS];
+
+interface Column {
+  id: ColumnId;
+  label: string;
+  minWidth?: number;
+  align?: 'right' | 'left';
+  format?: (value: number) => string;
+}
+
+interface TransactionHistory {
+    id: number
+    ticker: string
+    company: string
+    qty: number
+    action: string
+    purchasePrice: number
+    totalAmount: number
+    date: string
+}
 
 function UserHistoryTable() {
     const { historyState, historyDispatch } = useHistoryContext()
     const [order, setOrder] = useState<Order>('desc')
-    const [orderBy, setOrderBy] = useState<keyof TransactionHistory>('date')
+    const [orderBy, setOrderBy] = useState<keyof TransactionHistory>(COLUMN_IDS.DATE)
     const [companyFilter, setCompanyFilter] = useState<string | null>(null)
     const [actionFilter, setActionFilter] = useState<string | null>(null) // Action用のフィルター状態を追加
 
@@ -42,63 +73,37 @@ function UserHistoryTable() {
         setPage(0)
     }
 
-    interface Column {
-        id:
-            | 'ticker'
-            | 'company'
-            | 'qty'
-            | 'action'
-            | 'purchasePrice'
-            | 'totalAmount'
-            | 'date'
-        label: string
-        minWidth?: number
-        align?: 'right' | 'left'
-        format?: (value: number) => string
-    }
-
-    interface TransactionHistory {
-        id: number
-        ticker: string
-        company: string
-        qty: number
-        action: string
-        purchasePrice: number
-        totalAmount: number
-        date: string
-    }
-
     const columns: readonly Column[] = [
-        { id: 'ticker', label: 'Symbol', minWidth: 100, align: 'left' },
-        { id: 'company', label: 'Company', minWidth: 100, align: 'left' },
+        { id: COLUMN_IDS.TICKER, label: 'Symbol', minWidth: 100, align: 'left' },
+        { id: COLUMN_IDS.COMPANY, label: 'Company', minWidth: 100, align: 'left' },
         {
-            id: 'qty',
+            id: COLUMN_IDS.QUANTITY,
             label: 'Quantity',
             minWidth: 70,
             align: 'right',
             format: (value: number) => value.toLocaleString('en-US'),
         },
         {
-            id: 'action',
+            id: COLUMN_IDS.ACTION,
             label: 'Action',
             minWidth: 70,
             align: 'left',
         },
         {
-            id: 'purchasePrice',
+            id: COLUMN_IDS.PURCHASE_PRICE,
             label: 'Purchase Price ($)',
             minWidth: 100,
             align: 'right',
         },
         {
-            id: 'totalAmount',
+            id: COLUMN_IDS.TOTAL_AMOUNT,
             label: 'Total Amount ($)',
             minWidth: 100,
             align: 'right',
             format: (value: number) => value.toFixed(2),
         },
         {
-            id: 'date',
+            id: COLUMN_IDS.DATE,
             label: 'Timestamp',
             minWidth: 100,
             align: 'left',
@@ -106,7 +111,7 @@ function UserHistoryTable() {
     ]
 
     function descendingComparator<T>(a: T, b: T, orderBy: keyof T) {
-        if (orderBy === 'date') {
+        if (orderBy === COLUMN_IDS.DATE) {
             const dateA = new Date(a[orderBy] as string)
             const dateB = new Date(b[orderBy] as string)
             return dateB.getTime() - dateA.getTime()
@@ -133,10 +138,10 @@ function UserHistoryTable() {
             : (a, b) => -descendingComparator(a, b, orderBy)
     }
 
-    const handleRequestSort = (property: keyof TransactionHistory) => {
+    const handleRequestSort = (property: Column['id']) => {
         const isAsc = orderBy === property && order === 'asc'
         setOrder(isAsc ? 'desc' : 'asc')
-        setOrderBy(property)
+        setOrderBy(property as keyof TransactionHistory)
     }
 
     useEffect(() => {
@@ -261,7 +266,7 @@ function UserHistoryTable() {
                                         {columns.map((column) => {
                                             const value = row[column.id];
                                             
-                                            if (column.id === 'company') {
+                                            if (column.id === COLUMN_IDS.COMPANY) {
                                                 return (
                                                     <TableCell
                                                         key={column.id}
@@ -281,7 +286,7 @@ function UserHistoryTable() {
                                                 );
                                             }
                                             
-                                            if (column.id === 'action') {
+                                            if (column.id === COLUMN_IDS.ACTION) {
                                                 return (
                                                     <TableCell
                                                         key={column.id}
