@@ -232,6 +232,17 @@ export default function UserStocksTable() {
         }
     }
 
+    useEffect(() => {
+        const newId = userStocksState.find(
+            (row) => row.ticker === selectedStockState.selectedStock
+        )
+        if (newId !== undefined) {
+            setSelectedId(newId!.id)
+        } else {
+            setSelectedId(-1)
+        }
+    }, [selectedStockState.selectedStock])
+
     const handleChangePage = (event: unknown, newPage: number) => {
         setPage(newPage)
     }

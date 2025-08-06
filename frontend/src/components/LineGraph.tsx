@@ -40,17 +40,6 @@ function LineGraph() {
     const [date, setDate] = React.useState(new Date())
     const [graphPeriod, setGraphPeriod] = useState(10)
 
-    useEffect(() => {
-        switch (lineChartView) {
-            case 'stock':
-                setLineGraphData([1000, 2800, 1050, 1890, 1505, 3800])
-                break
-            case 'portfolio':
-                setLineGraphData([2000, 1000, 1500, 3400, 4000, 3200])
-                break
-        }
-    }, [lineChartView])
-
     return (
         <div>
             <LineChart
