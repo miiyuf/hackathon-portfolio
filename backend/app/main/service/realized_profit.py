@@ -74,7 +74,7 @@ def get_realized_profit():
             if row['realized_profit'] is not None:
                 total_realized_profit += Decimal(str(row['realized_profit']))
             
-            # 数値型をフロートに変換（JSONシリアライズのため）
+            # Convert numeric types to float (for JSON serialization)
             processed_row = {}
             for key, value in row.items():
                 if isinstance(value, Decimal):
