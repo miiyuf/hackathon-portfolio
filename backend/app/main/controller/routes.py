@@ -73,4 +73,18 @@ def get_portfolio():
         return jsonify({"error": "No portfolio data found"}), 404
     return result
 
+@price_bp.route('/long_term_price/<symbol>', methods=['GET'])
+def get_long_stock_price(symbol):
+    result = Price.get_long_stock_price(symbol)
+    if result is None:
+        return jsonify({"error": f"Could not fetch long-term price for symbol: {symbol}"}), 500
+    return result
+
+
+@price_bp.route('/long_term_balance', methods=['GET'])
+def get_long_term_balance():
+    result = Price.get_long_term_balance()
+    if result is None:
+        return jsonify({"error": "Could not fetch long-term balance"}), 500
+    return result
 
