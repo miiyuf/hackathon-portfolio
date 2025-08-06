@@ -1,12 +1,33 @@
 import React from 'react'
+import { useState, useEffect } from 'react'
 import { LineChart, lineElementClasses } from '@mui/x-charts/LineChart'
 import { useSelectedStockContext } from '../contexts/SelectedStockContext'
+import { ToggleButton, ToggleButtonGroup } from '@mui/material'
+
 const uData = [1000, 2800, 1050, 1890, 1505, 3800]
 const xLabels = ['Jul 1', 'Jul 7', 'Jul 14', 'Jul 21', 'Jul 28', 'Today']
 
 function LineGraph() {
     const { selectedStockState, selectedStockDispatch } =
         useSelectedStockContext()
+    const [lineGraphData, setLineGraphData] = useState<number[]>([])
+    const [lineChartView, setLineChartView] = useState('stock')
+    const handleLineChartViewChange = (
+        e: React.MouseEvent<HTMLElement>,
+        newView: string
+    ) => {
+        setLineChartView(newView)
+    }
+    useEffect(() => {
+        switch (lineChartView) {
+            case 'stock':
+                setLineGraphData([1000, 2800, 1050, 1890, 1505, 3800])
+                break
+            case 'portfolio':
+                setLineGraphData([2000, 1000, 1500, 3400, 4000, 3200])
+                break
+        }
+    }, [lineChartView])
     return (
         <div>
             <LineChart
@@ -14,7 +35,7 @@ function LineGraph() {
                 width={650}
                 series={[
                     {
-                        data: uData,
+                        data: lineGraphData,
                         label: `${selectedStockState.selectedStock}`,
                         area: true,
                         showMark: false,
@@ -28,6 +49,22 @@ function LineGraph() {
                     },
                 }}
             />
+            <ToggleButtonGroup
+                value={lineChartView}
+                exclusive
+                onChange={handleLineChartViewChange}
+                aria-label="pie chart view options"
+                sx={{
+                    height: 30,
+                }}
+            >
+                <ToggleButton value="stock" aria-label="right aligned">
+                    individual holding
+                </ToggleButton>
+                <ToggleButton value="portfolio" aria-label="right aligned">
+                    total portfolio balance
+                </ToggleButton>
+            </ToggleButtonGroup>
         </div>
     )
 }

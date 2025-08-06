@@ -4,7 +4,7 @@ const API = axios.create({
     baseURL: import.meta.env.VITE_APP_API_URL, // || 'http://localhost:8000',
 })
 
-export interface PortfolioData {
+export interface HoldingData {
     symbol: string
     name: string
     total_quantity: number
@@ -13,10 +13,10 @@ export interface PortfolioData {
     profit_loss: number
 }
 
-export const fetchPortfolioData = async (): Promise<PortfolioData[]> => {
+export const fetchPortfolioData = async (): Promise<HoldingData[]> => {
     try {
         const res = await API.get('/api/portfolio')
-        return res.data
+        return res.data.holdings
     } catch (error) {
         console.error('Failed to fetch portfolio data:', error)
         throw error
@@ -65,6 +65,23 @@ export interface TransactionData {
 export const fetchTransactions = async (): Promise<TransactionData[]> => {
     try {
         const response = await API.get(`/api/transaction`)
+        return response.data
+    } catch (error) {
+        console.error('Error fetching transactions:', error)
+        throw error
+    }
+}
+
+export interface PortfolioData {
+    holdings: HoldingData[]
+    total_net_investment: string
+    total_portfolio_balance: string
+}
+
+export const fetchTotalPortfolioBalance = async (): Promise<PortfolioData> => {
+    try {
+        const response = await API.get('/api/portfolio')
+        console.log(response.data)
         return response.data
     } catch (error) {
         console.error('Error fetching transactions:', error)

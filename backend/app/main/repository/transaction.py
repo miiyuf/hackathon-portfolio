@@ -6,7 +6,7 @@ from flask import Blueprint, request, jsonify
 # @transaction_bp.route('/transaction', methods=['GET'])
 def get_transactions():
     """
-    Fetch all transactions from the 'stocks' table, ordered by ID (latest first).
+    Fetch all transactions from the 'transactions' table, ordered by ID (latest first).
     Returns:
         JSON response with the list of transactions or an error message if the DB connection fails.
     """
@@ -17,11 +17,11 @@ def get_transactions():
     cursor = conn.cursor(dictionary=True)
 
     query = """
-    SELECT stocks.id, stocks.symbol, stock_master.name, stocks.purchase_price, 
-    stocks.action, stocks.quantity
-    FROM stocks
-    JOIN stock_master ON stocks.symbol=stock_master.symbol
-    ORDER BY stocks.id DESC;
+    SELECT transactions.id, transactions.symbol, stock_master.name, transactions.purchase_price, 
+    transactions.action, transactions.quantity
+    FROM transactions
+    JOIN stock_master ON transactions.symbol=stock_master.symbol
+    ORDER BY transactions.id DESC;
     """
     cursor.execute(query)
 

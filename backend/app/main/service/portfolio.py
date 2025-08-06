@@ -16,7 +16,8 @@ def get_portfolio():
     """
     logger.info("Starting get_portfolio service function.")
     
-    holdings = fetch_holdings()
+    holdings = fetch_holdings(True)
+    # After DB Fetch Log
     logger.info(f"Fetched {len(holdings)} unique holdings from the database.")
     
     detailed_holdings = []
@@ -26,7 +27,9 @@ def get_portfolio():
 
     for holding in holdings:
         symbol = holding['symbol']
+        # Inside Loop Log
         logger.info(f"Processing symbol: {symbol}...")
+        # app.logger.info(f"Holding: {holding}")
         
         # Fetch current price for display purposes
         current_price = get_real_price(symbol)
@@ -55,7 +58,7 @@ def get_portfolio():
         
         # Add current market data if available
         if current_price is not None:
-            logger.info(f"Successfully fetched price for {symbol}: {current_price} in {price_fetch_time:.2f}s")
+            logger.info(f"Successfully fetched price for {symbol}: {current_price}")
             success_price_fetch_count += 1
             current_price_decimal = Decimal(str(current_price))
             holding['current_price'] = str(current_price_decimal)

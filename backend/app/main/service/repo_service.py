@@ -125,8 +125,8 @@ def get_transactions():
     start_time = time.time()
     
     results = transaction.get_transactions()
-    
-    logger.info(f"get_transactions() completed in {time.time() - start_time:.2f}s - Retrieved {len(results)} transactions")
+    logger.info(results)
+    logger.info(f"get_transactions() completed in {time.time() - start_time:.2f}s") # Retrieved {len(results)} transactions")
     return results
 
 def update_current_prices():

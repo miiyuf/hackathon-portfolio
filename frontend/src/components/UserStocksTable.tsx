@@ -21,6 +21,7 @@ import {
 import { visuallyHidden } from '@mui/utils'
 import { useUserStocksContext } from '../contexts/UserStocksContext'
 import { type UserStockState } from '../contexts/UserStocksContext'
+import { updateUserStocks } from '../contexts/UserStocksContext'
 
 function descendingComparator<T>(a: T, b: T, orderBy: keyof T) {
     if (b[orderBy] < a[orderBy]) {
@@ -255,6 +256,10 @@ export default function UserStocksTable() {
                 .slice(page * rowsPerPage, page * rowsPerPage + rowsPerPage),
         [order, orderBy, page, rowsPerPage, userStocksState]
     )
+
+    useEffect(() => {
+        updateUserStocks(userStocksDispatch)
+    }, [])
 
     return (
         <Box sx={{ width: '100%', paddingTop: 3 }}>
