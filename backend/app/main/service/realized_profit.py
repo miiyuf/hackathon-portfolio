@@ -70,7 +70,7 @@ def get_realized_profit():
         processed_results = []
         for row in results:
             transactions_processed += 1
-            # None値をチェック
+            # Check for None values
             if row['realized_profit'] is not None:
                 total_realized_profit += Decimal(str(row['realized_profit']))
             
