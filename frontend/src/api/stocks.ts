@@ -102,11 +102,12 @@ export const fetchTotalPortfolioBalance = async (): Promise<PortfolioData> => {
     }
 }
 
-export const fetchProfitLoss = async (): Promise<HoldingData[]> => {
+export const fetchLongTermStockHistory = async (
+    symbol: string
+): Promise<[]> => {
     try {
-        const response = await axios.get(`${API}/profit_loss`)
-        console.log(response.data)
-        return response.data
+        const response = await API.get(`/api/long_term_price/${symbol}`)
+        return response.data.long_term_price
     } catch (error) {
         console.error('Error fetching profit/loss data:', error)
         throw error

@@ -3,6 +3,7 @@ import { UserStocksProvider } from './contexts/UserStocksContext'
 import { SelectedStockProvider } from './contexts/SelectedStockContext'
 import { HistoryProvider } from './contexts/HistoryContext'
 import { PortfolioBalanceProvider } from './contexts/PortfolioInfoContext'
+import { GraphContextProvider } from './contexts/GraphContext'
 
 export function GlobalProvider({ children }: { children: React.ReactNode }) {
     return (
@@ -10,7 +11,9 @@ export function GlobalProvider({ children }: { children: React.ReactNode }) {
             <TradingContextProvider>
                 <UserStocksProvider>
                     <SelectedStockProvider>
-                        <HistoryProvider>{children}</HistoryProvider>
+                        <GraphContextProvider>
+                            <HistoryProvider>{children}</HistoryProvider>
+                        </GraphContextProvider>
                     </SelectedStockProvider>
                 </UserStocksProvider>
             </TradingContextProvider>

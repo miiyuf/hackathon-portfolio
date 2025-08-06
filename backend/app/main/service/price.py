@@ -33,7 +33,6 @@ def get_long_term_balance():
     """
 
     """
-    # Placeholder for actual implementation
 
     get_long_term_balances = []
     
@@ -41,21 +40,9 @@ def get_long_term_balance():
     for holding in holdings:
         symbol = holding.get('symbol')
         quantity = holding.get('quantity', 0)
-        # koko nao shite ...
         prices = get_long_term_price(symbol,days=10)
         balances_per_symbol = np.array(prices) * quantity
         get_long_term_balances.append(balances_per_symbol)
-    # symbol = "AAPL"
-    # quantity = 10 
-    # prices = get_long_term_price(symbol,days=10)
-    # balances_per_symbol = np.array(prices) * quantity
-    # get_long_term_balances.append(balances_per_symbol)
-
-    # symbol = "AAPL"
-    # quantity = 10 
-    # prices = get_long_term_price(symbol,days=10)
-    # balances_per_symbol = np.array(prices) * quantity
-    # get_long_term_balances.append(balances_per_symbol)
     
     get_long_term_balance = np.sum(get_long_term_balances, axis=0).tolist()
 

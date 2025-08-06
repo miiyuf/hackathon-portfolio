@@ -4,6 +4,7 @@ import './Home.css'
 import PieChart from '../components/PieChart'
 import LineGraph from '../components/LineGraph'
 import TotalPortfolioInfo from '../components/TotalPortfolioInfo'
+import { fetchLongTermStockHistory } from '../api/stocks'
 
 function Home() {
     return (
