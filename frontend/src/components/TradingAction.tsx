@@ -154,6 +154,7 @@ function TradingAction() {
             }
         } catch (error) {
             console.log('Error selling stock: ', error)
+            alert('An error occurred while selling the stock. Please try again.')
         } finally {
             handleClose()
         }
