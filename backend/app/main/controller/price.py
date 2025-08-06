@@ -28,7 +28,7 @@ def get_current_prices():
         
         # Process query results
         result = cursor.fetchall()
-        prices = {row['symbol']: float(row['price']) for row in result}  # resultを使用
+        prices = {row['symbol']: float(row['price']) for row in result}
         
         # Log successful retrieval with details
         symbol_count = len(prices)
