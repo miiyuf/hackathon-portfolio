@@ -6,3 +6,6 @@ backend/__pycache__/
 backend/app/main/service/__pycache__/
 backend/app/main/__pycache__/
 backend/app/main/repository/__pycache__/
+backend/app/main/database/__pycache__/
+backend/tests/__pycache__/
+.vscode/launch.json
