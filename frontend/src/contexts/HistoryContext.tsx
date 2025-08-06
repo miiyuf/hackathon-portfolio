@@ -65,7 +65,7 @@ export const fetchTransactionHistory = async (
                     purchasePrice: transaction.purchase_price,
                     totalAmount:
                         transaction.purchase_price * transaction.quantity,
-                    date: transaction.transaction_date ?? 'N/A',
+                    date: transaction.created_at ?? 'N/A',
                 }
             }
         )
