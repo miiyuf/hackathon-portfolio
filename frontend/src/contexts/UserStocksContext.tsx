@@ -47,6 +47,32 @@ export function useUserStocksContext() {
     return useContext(UserStocksContext)
 }
 
+export const updateUserStocks = async (
+    userStocksDispatch: React.Dispatch<{
+        type: string
+        state?: UserStockState[]
+    }>
+) => {
+    try {
+        const data = await fetchPortfolioData()
+        console.log('Global context portfolio data:', data)
+        const portfolioData: UserStockState[] = data.map((holding, i) => {
+            return {
+                id: i,
+                ticker: holding.symbol,
+                stockName: holding.name || 'N/A',
+                qty: holding.total_quantity,
+                costPrice: holding.purchase_price,
+                currentPrice: holding.current_price,
+                profitLoss: holding.profit_loss,
+            }
+        })
+        userStocksDispatch({ type: 'INIT_STOCK', state: portfolioData })
+    } catch (error) {
+        console.error('Error fetching portfolio data:', error)
+    }
+}
+
 export function UserStocksProvider({
     children,
 }: {
@@ -56,34 +82,6 @@ export function UserStocksProvider({
         userStocksReducer,
         initUserStocksState
     )
-
-    const { tradingModalState, tradingModalDispatch } = useTradingContext()
-
-    useEffect(() => {
-        const testFetch = async () => {
-            try {
-                const data = await fetchPortfolioData()
-                console.log('Global context portfolio data:', data)
-                const portfolioData: UserStockState[] = data.map(
-                    (holding, i) => {
-                        return {
-                            id: i,
-                            ticker: holding.symbol,
-                            stockName: holding.name || 'N/A',
-                            qty: holding.total_quantity,
-                            costPrice: holding.purchase_price,
-                            currentPrice: holding.current_price,
-                            profitLoss: holding.profit_loss,
-                        }
-                    }
-                )
-                userStocksDispatch({ type: 'INIT_STOCK', state: portfolioData })
-            } catch (error) {
-                console.error('Error fetching portfolio data:', error)
-            }
-        }
-        testFetch()
-    }, [tradingModalState.isOpen])
 
     return (
         <UserStocksContext.Provider

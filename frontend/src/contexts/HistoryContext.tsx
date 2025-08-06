@@ -1,5 +1,6 @@
 import type React from 'react'
 import { createContext, useContext, useReducer } from 'react'
+import { fetchTransactions } from '../api/stocks'
 
 export interface HistoryState {
     id: number
@@ -14,9 +15,9 @@ export interface HistoryState {
 
 interface HistoryContextType {
     historyState: HistoryState[]
-    historyDispatch?: React.Dispatch<{
+    historyDispatch: React.Dispatch<{
         type: string
-        state: HistoryState[]
+        state?: HistoryState[]
     }>
 }
 
@@ -43,6 +44,38 @@ function historyReducer(
 
 export function useHistoryContext() {
     return useContext(HistoryContext)
+}
+
+export const fetchTransactionHistory = async (
+    historyDispatch: React.Dispatch<{
+        type: string
+        state?: HistoryState[]
+    }>
+) => {
+    try {
+        const transactionHistory = await fetchTransactions()
+        const parsedTransactionHistory = transactionHistory.map(
+            (transaction, index) => {
+                return {
+                    id: index,
+                    ticker: transaction.symbol,
+                    company: transaction.name,
+                    qty: transaction.quantity,
+                    action: transaction.action === 'buy' ? 'Buy' : 'Sell',
+                    purchasePrice: transaction.purchase_price,
+                    totalAmount:
+                        transaction.purchase_price * transaction.quantity,
+                    date: transaction.transaction_date ?? 'N/A',
+                }
+            }
+        )
+        historyDispatch({
+            type: 'INIT_HISTORY',
+            state: parsedTransactionHistory,
+        })
+    } catch (error) {
+        console.log('Error fetching transaction history: ', error)
+    }
 }
 
 export function HistoryProvider({ children }: { children: React.ReactNode }) {

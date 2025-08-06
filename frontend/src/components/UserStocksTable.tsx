@@ -1,5 +1,5 @@
 import * as React from 'react'
-import { useState, type Dispatch, type SetStateAction } from 'react'
+import { useState, useEffect, type Dispatch, type SetStateAction } from 'react'
 import { alpha } from '@mui/material/styles'
 import { useSelectedStockContext } from '../contexts/SelectedStockContext'
 import { useTradingContext } from '../contexts/TradingContext'
@@ -21,6 +21,7 @@ import {
 import { visuallyHidden } from '@mui/utils'
 import { useUserStocksContext } from '../contexts/UserStocksContext'
 import { type UserStockState } from '../contexts/UserStocksContext'
+import { updateUserStocks } from '../contexts/UserStocksContext'
 
 function descendingComparator<T>(a: T, b: T, orderBy: keyof T) {
     if (b[orderBy] < a[orderBy]) {
@@ -255,6 +256,10 @@ export default function UserStocksTable() {
                 .slice(page * rowsPerPage, page * rowsPerPage + rowsPerPage),
         [order, orderBy, page, rowsPerPage, userStocksState]
     )
+
+    useEffect(() => {
+        updateUserStocks(userStocksDispatch)
+    }, [])
 
     return (
         <Box sx={{ width: '100%', paddingTop: 3 }}>

@@ -18,11 +18,22 @@ import {
     type StockTransaction,
 } from '../api/stocks'
 import { useSelectedStockContext } from '../contexts/SelectedStockContext'
+import { getPortfolioBalance } from '../contexts/PortfolioBalanceContext'
+import { usePortfolioBalanceContext } from '../contexts/PortfolioBalanceContext'
+import { updateUserStocks } from '../contexts/UserStocksContext'
+import { useUserStocksContext } from '../contexts/UserStocksContext'
+import { useHistoryContext } from '../contexts/HistoryContext'
+import { fetchTransactionHistory } from '../contexts/HistoryContext'
 
 function TradingAction() {
     const { tradingModalState, tradingModalDispatch } = useTradingContext()
+    const { userStocksState, userStocksDispatch } = useUserStocksContext()
+
     const { selectedStockState, selectedStockDispatch } =
         useSelectedStockContext()
+    const { portfolioBalanceState, portfolioBalanceDispatch } =
+        usePortfolioBalanceContext()
+    const { historyState, historyDispatch } = useHistoryContext()
 
     const handleOpen = () => {
         tradingModalDispatch({
@@ -33,7 +44,7 @@ function TradingAction() {
             },
         })
         if (selectedStockState.selectedStock !== '') {
-            displayCurrentPrice()
+            displaySymbolPrice(selectedStockState.selectedStock)
         }
     }
     const handleClose = () => {
@@ -56,7 +67,9 @@ function TradingAction() {
     // fetch current price once user clicks out of stock symbol field
     const displayCurrentPrice = async () => {
         try {
-            const currentPrice = await getCurrentPrice()
+            const currentPrice = await getCurrentPrice(
+                tradingModalState.symbol || ''
+            )
             if (currentPrice) {
                 setCurrentPrice(currentPrice.toFixed(2))
             }
@@ -65,11 +78,20 @@ function TradingAction() {
         }
     }
 
-    const getCurrentPrice = async () => {
+    const displaySymbolPrice = async (symbol: string) => {
         try {
-            const currentPrice = await fetchCurrentPrice(
-                tradingModalState.symbol || ''
-            )
+            const currentPrice = await getCurrentPrice(symbol)
+            if (currentPrice) {
+                setCurrentPrice(currentPrice.toFixed(2))
+            }
+        } catch (error) {
+            console.error('Error displaying current price:', error)
+        }
+    }
+
+    const getCurrentPrice = async (symbol: string) => {
+        try {
+            const currentPrice = await fetchCurrentPrice(symbol)
             return currentPrice
         } catch (error) {
             console.error('Error fetching current price:', error)
@@ -78,7 +100,9 @@ function TradingAction() {
 
     const buyStock = async () => {
         try {
-            const buyingPrice = await getCurrentPrice()
+            const buyingPrice = await getCurrentPrice(
+                tradingModalState.symbol || ''
+            )
             if (tradingModalState.symbol && buyingPrice) {
                 const newStock: StockTransaction = {
                     symbol: tradingModalState.symbol!,
@@ -95,6 +119,13 @@ function TradingAction() {
         } catch (error) {
             console.log('Error buying stock: ', error)
         } finally {
+            // update total portfolio balance
+            getPortfolioBalance(portfolioBalanceDispatch)
+            // update user stocks
+            updateUserStocks(userStocksDispatch)
+            // update history
+            fetchTransactionHistory(historyDispatch)
+
             handleClose()
         }
     }

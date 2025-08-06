@@ -10,8 +10,8 @@ import {
     TableRow,
     TablePagination,
 } from '@mui/material'
-import { fetchTransactions } from '../api/stocks'
 import { useHistoryContext } from '../contexts/HistoryContext'
+import { fetchTransactionHistory } from '../contexts/HistoryContext'
 
 function UserHistoryTable() {
     const { historyState, historyDispatch } = useHistoryContext()
@@ -79,34 +79,8 @@ function UserHistoryTable() {
         },
     ]
 
-    const fetchTransactionHistory = async () => {
-        try {
-            const transactionHistory = await fetchTransactions()
-            const parsedTransactionHistory = transactionHistory.map(
-                (transaction, index) => {
-                    return {
-                        id: index,
-                        ticker: transaction.symbol,
-                        company: transaction.name,
-                        qty: transaction.quantity,
-                        action: transaction.action === 'buy' ? 'Buy' : 'Sell',
-                        purchasePrice: transaction.purchase_price,
-                        totalAmount:
-                            transaction.purchase_price * transaction.quantity,
-                        date: transaction.transaction_date ?? 'N/A',
-                    }
-                }
-            )
-            historyDispatch({
-                type: 'INIT_HISTORY',
-                state: parsedTransactionHistory,
-            })
-        } catch (error) {
-            console.log('Error fetching transaction history: ', error)
-        }
-    }
     useEffect(() => {
-        fetchTransactionHistory()
+        fetchTransactionHistory(historyDispatch)
     }, [])
 
     const [page, setPage] = React.useState(0)
