@@ -59,7 +59,7 @@ def test_get_portfolio(mocker):
     assert float(get_portfolio_response['holdings'][0]["net_investment"]) == float(expected_detailed_holdings['holdings'][0]['net_investment'])
     assert float(get_portfolio_response['holdings'][0]["current_price"]) == float(expected_detailed_holdings['holdings'][0]['current_price'])
     assert float(get_portfolio_response['holdings'][0]["market_value"]) == float(expected_detailed_holdings['holdings'][0]['market_value'])
-    assert float(get_portfolio_response['holdings'][0]["unrealized_profit_loss"])   == float(expected_detailed_holdings['holdings'][0]['unrealized_profit_loss'])      
+    assert float(get_portfolio_response['holdings'][0]["unrealized_profit_loss"]) == float(expected_detailed_holdings['holdings'][0]['unrealized_profit_loss'])      
 
 
 
