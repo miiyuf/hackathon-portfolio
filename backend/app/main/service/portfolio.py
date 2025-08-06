@@ -29,9 +29,8 @@ def get_portfolio():
         logger.info(f"Processing symbol: {symbol}...")
         
         # Fetch current price for display purposes
-        price_fetch_start = time.time()
         current_price = get_real_price(symbol)
-        price_fetch_time = time.time() - price_fetch_start
+        
         
         # Calculate portfolio value based on transaction history
         total_buy_value = Decimal(str(holding['total_buy_value']))
