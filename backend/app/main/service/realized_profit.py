@@ -31,8 +31,8 @@ def get_realized_profit():
     try:
         cursor = conn.cursor(dictionary=True)
         
-        # クエリは買い取引の平均価格と売り取引を比較して実現損益を計算
-        # 注：この例はFIFOではなく平均原価法を使用しています
+        # The query compares the average purchase price of buy transactions with sell transactions to calculate realized profit/loss
+        # Note: This example uses average cost method instead of FIFO
         query = """
         WITH buy_avg AS (
             SELECT 
