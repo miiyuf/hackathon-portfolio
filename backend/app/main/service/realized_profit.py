@@ -63,7 +63,7 @@ def get_realized_profit():
         cursor.execute(query)
         results = cursor.fetchall()
         
-        # 集計値の計算
+        # Calculate aggregate values
         total_realized_profit = Decimal('0')
         transactions_processed = 0
         
