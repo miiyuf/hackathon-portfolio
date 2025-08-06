@@ -54,7 +54,7 @@ def test_get_portfolio(mocker):
     assert get_portfolio_response['total_net_investment'] == expected_detailed_holdings['total_net_investment']
     assert get_portfolio_response['holdings'][0]["symbol"] == expected_detailed_holdings['holdings'][0]['symbol']
     assert get_portfolio_response['holdings'][0]["name"] == expected_detailed_holdings['holdings'][0]['name']
-    assert float(get_portfolio_response['holdings'][0]["total_quantity"] )== float(expected_detailed_holdings['holdings'][0]['total_quantity'])
+    assert float(get_portfolio_response['holdings'][0]["total_quantity"]) == float(expected_detailed_holdings['holdings'][0]['total_quantity'])
     assert float(get_portfolio_response['holdings'][0]["total_buy_value"]) == float(expected_detailed_holdings['holdings'][0]['total_buy_value'])
     assert float(get_portfolio_response['holdings'][0]["total_sell_value"]) == float(expected_detailed_holdings['holdings'][0]['total_sell_value'])
     assert float(get_portfolio_response['holdings'][0]["net_investment"]) == float(expected_detailed_holdings['holdings'][0]['net_investment'])
