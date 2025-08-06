@@ -1,4 +1,4 @@
-import React from 'react'
+import React, { useState } from 'react'
 import { useEffect } from 'react'
 import {
     Paper,
@@ -9,12 +9,19 @@ import {
     TableHead,
     TableRow,
     TablePagination,
+    TableSortLabel,
+    Box
 } from '@mui/material'
+import { visuallyHidden } from '@mui/utils'
 import { useHistoryContext } from '../contexts/HistoryContext'
 import { fetchTransactionHistory } from '../contexts/HistoryContext'
 
+type Order = 'asc' | 'desc'
+
 function UserHistoryTable() {
     const { historyState, historyDispatch } = useHistoryContext()
+    const [order, setOrder] = useState<Order>('desc')
+    const [orderBy, setOrderBy] = useState<keyof TransactionHistory>('date')
 
     interface Column {
         id:
@@ -79,6 +86,40 @@ function UserHistoryTable() {
         },
     ]
 
+    function descendingComparator<T>(a: T, b: T, orderBy: keyof T) {
+        if (orderBy === 'date') {
+            const dateA = new Date(a[orderBy] as string)
+            const dateB = new Date(b[orderBy] as string)
+            return dateB.getTime() - dateA.getTime()
+        }
+
+        if (b[orderBy] < a[orderBy]) {
+            return -1
+        }
+        if (b[orderBy] > a[orderBy]) {
+            return 1
+        }
+        return 0
+    }
+
+    function getComparator<Key extends keyof any>(
+        order: Order,
+        orderBy: Key
+    ): (
+        a: { [key in Key]: number | string },
+        b: { [key in Key]: number | string }
+    ) => number {
+        return order === 'desc'
+            ? (a, b) => descendingComparator(a, b, orderBy)
+            : (a, b) => -descendingComparator(a, b, orderBy)
+    }
+
+    const handleRequestSort = (property: keyof TransactionHistory) => {
+        const isAsc = orderBy === property && order === 'asc'
+        setOrder(isAsc ? 'desc' : 'asc')
+        setOrderBy(property)
+    }
+
     useEffect(() => {
         fetchTransactionHistory(historyDispatch)
     }, [])
@@ -95,6 +136,11 @@ function UserHistoryTable() {
         setRowsPerPage(+event.target.value)
         setPage(0)
     }
+
+    const sortedData = React.useMemo(() => {
+        return [...historyState].sort(getComparator(order, orderBy))
+    }, [historyState, order, orderBy])
+
     return (
         <Paper sx={{ width: '100%', overflow: 'hidden' }}>
             <TableContainer sx={{ maxHeight: 440 }}>
@@ -106,14 +152,39 @@ function UserHistoryTable() {
                                     key={column.id}
                                     align={column.align}
                                     style={{ minWidth: column.minWidth }}
+                                    sortDirection={
+                                        orderBy === column.id ? order : false
+                                    }
                                 >
-                                    {column.label}
+                                    <TableSortLabel
+                                        active={orderBy === column.id}
+                                        direction={
+                                            orderBy === column.id
+                                                ? order
+                                                : 'asc'
+                                        }
+                                        onClick={() =>
+                                            handleRequestSort(column.id)
+                                        }
+                                    >
+                                        {column.label}
+                                        {orderBy === column.id ? (
+                                            <Box
+                                                component="span"
+                                                sx={visuallyHidden}
+                                            >
+                                                {order === 'desc'
+                                                    ? 'sorted descending'
+                                                    : 'sorted ascending'}
+                                            </Box>
+                                        ) : null}
+                                    </TableSortLabel>
                                 </TableCell>
                             ))}
                         </TableRow>
                     </TableHead>
                     <TableBody>
-                        {historyState
+                        {sortedData
                             .slice(
                                 page * rowsPerPage,
                                 page * rowsPerPage + rowsPerPage
