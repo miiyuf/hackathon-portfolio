@@ -18,7 +18,7 @@ def get_transactions():
 
     query = """
     SELECT transactions.id, transactions.symbol, stock_master.name, transactions.purchase_price, 
-    transactions.action, transactions.quantity
+    transactions.action, transactions.quantity, transactions.created_at
     FROM transactions
     JOIN stock_master ON transactions.symbol=stock_master.symbol
     ORDER BY transactions.id DESC;
@@ -26,7 +26,14 @@ def get_transactions():
     cursor.execute(query)
 
     results = cursor.fetchall()
+    
+    for row in results:
+        if 'created_at' in row and row['created_at'] is not None:
+            row['created_at'] = row['created_at'].strftime('%Y-%m-%d %H:%M:%S')
+            
     cursor.close()
     conn.close()
+    
+    
 
     return jsonify(results)

@@ -54,6 +54,13 @@ button:focus-visible {
     outline: 4px auto -webkit-focus-ring-color;
 }
 
+@font-face {
+  font-family: 'Gotham';
+  src: url('/fonts/Gotham-Bold.woff2') format('woff2');
+  font-weight: bold;
+  font-style: normal;
+}
+
 @media (prefers-color-scheme: light) {
     :root {
         color: #213547;

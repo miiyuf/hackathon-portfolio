@@ -29,7 +29,14 @@ function TotalPortfolioInfo() {
                     alignItems: 'center',
                 }}
             >
-                <Typography variant="h4">
+                <Typography 
+                    variant="h4"
+                    sx={{ 
+                        fontFamily: 'Gotham, sans-serif',
+                        fontWeight: 'bold',
+                        letterSpacing: '0.5px'
+                    }}
+                >
                     Total Portfolio Balance:{' '}
                     <span
                         style={{
@@ -52,7 +59,16 @@ function TotalPortfolioInfo() {
                 </div>
             </div>
 
-            <Typography variant="h5" color="gray" mt={1}>
+            <Typography 
+                variant="h5" 
+                color="gray" 
+                mt={1}
+                sx={{ 
+                    fontFamily: 'Gotham, sans-serif',
+                    fontWeight: 'bold',
+                    letterSpacing: '0.5px'
+                }}
+            >
                 Total Portfolio Investment: $
                 {Number(portfolioInfoState.portfolioInvestment).toFixed(2)}
             </Typography>

@@ -31,7 +31,16 @@ function Sidebar() {
             anchor="left"
         >
             <Toolbar>
-                <Typography variant="h4">Portfolio</Typography>
+                <Typography 
+                    variant="h4" 
+                    sx={{ 
+                        fontFamily: 'Gotham, sans-serif',
+                        fontWeight: 'bold',
+                        letterSpacing: '0.5px'
+                    }}
+                >
+                    📈Portex
+                </Typography>
             </Toolbar>
             <Divider />
             <List
