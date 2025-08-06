@@ -36,7 +36,7 @@ def test_insert_stock_success(mocker):
     mock_conn = mocker.Mock()
 
     mock_conn.cursor.return_value = mock_cursor
-    mocker.patch('app.main.repository.stock.get_db_connection', side_effect=[mock_conn,])
+    mocker.patch('app.main.repository.stock.get_db_connection', side_effect=[mock_conn])
 
     mocker.patch('app.main.repository.stock.repo_service.get_stock_name_from_ticker', return_value="Apple Inc.")
     mocker.patch('app.main.repository.stock.insert_stock_symbol_pair_if_not_exists', return_value=None)
