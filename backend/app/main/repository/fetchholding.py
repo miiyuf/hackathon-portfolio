@@ -27,6 +27,8 @@ def fetch_holdings(include_purchase_price=False):
                 total.symbol,
                 sm.name,
                 total.total_quantity,
+                buy.total_buy_value,
+                IFNULL(sell.total_sell_value,0) AS total_sell_value,
                 ROUND(buy.total_buy_value / NULLIF(buy.total_buy_quantity, 0), 2) AS purchase_price
             FROM (
                 SELECT 
@@ -45,6 +47,15 @@ def fetch_holdings(include_purchase_price=False):
                 WHERE action = 'buy'
                 GROUP BY symbol
             ) AS buy ON total.symbol = buy.symbol
+            LEFT JOIN (
+                SELECT 
+                    symbol,
+                    SUM(purchase_price * quantity) AS total_sell_value,
+                    SUM(quantity) AS total_sell_quantity
+                from transactions
+                WHERE action = 'sell'
+                GROUP BY symbol
+            ) AS sell ON total.symbol = sell.symbol
             LEFT JOIN stock_master sm ON total.symbol = sm.symbol;
         """
         logger.info("Including purchase price in the query.")

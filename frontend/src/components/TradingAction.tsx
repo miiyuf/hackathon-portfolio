@@ -11,21 +11,44 @@ import {
     Typography,
     type SelectChangeEvent,
 } from '@mui/material'
-import { useTradingContext } from '../GlobalContext'
+import { useTradingContext } from '../contexts/TradingContext'
 import {
     fetchCurrentPrice,
     addStockTransaction,
     type StockTransaction,
 } from '../api/stocks'
+import { useSelectedStockContext } from '../contexts/SelectedStockContext'
+import { updateUserStocks } from '../contexts/UserStocksContext'
+import { useUserStocksContext } from '../contexts/UserStocksContext'
+import { useHistoryContext } from '../contexts/HistoryContext'
+import { fetchTransactionHistory } from '../contexts/HistoryContext'
+import {
+    updatePortfolioBalance,
+    updatePortfolioInvestment,
+    usePortfolioInfoContext,
+} from '../contexts/PortfolioInfoContext'
 
 function TradingAction() {
     const { tradingModalState, tradingModalDispatch } = useTradingContext()
+    const { userStocksState, userStocksDispatch } = useUserStocksContext()
+
+    const { selectedStockState, selectedStockDispatch } =
+        useSelectedStockContext()
+    const { portfolioInfoState, portfolioInfoDispatch } =
+        usePortfolioInfoContext()
+    const { historyState, historyDispatch } = useHistoryContext()
 
     const handleOpen = () => {
         tradingModalDispatch({
             type: 'OPEN_MODAL_WITH_DATA',
-            state: { isOpen: true, symbol: '' },
+            state: {
+                isOpen: true,
+                symbol: selectedStockState.selectedStock || '',
+            },
         })
+        if (selectedStockState.selectedStock !== '') {
+            displaySymbolPrice(selectedStockState.selectedStock)
+        }
     }
     const handleClose = () => {
         setAction('')
@@ -47,7 +70,9 @@ function TradingAction() {
     // fetch current price once user clicks out of stock symbol field
     const displayCurrentPrice = async () => {
         try {
-            const currentPrice = await getCurrentPrice()
+            const currentPrice = await getCurrentPrice(
+                tradingModalState.symbol || ''
+            )
             if (currentPrice) {
                 setCurrentPrice(currentPrice.toFixed(2))
             }
@@ -56,11 +81,20 @@ function TradingAction() {
         }
     }
 
-    const getCurrentPrice = async () => {
+    const displaySymbolPrice = async (symbol: string) => {
         try {
-            const currentPrice = await fetchCurrentPrice(
-                tradingModalState.symbol || ''
-            )
+            const currentPrice = await getCurrentPrice(symbol)
+            if (currentPrice) {
+                setCurrentPrice(currentPrice.toFixed(2))
+            }
+        } catch (error) {
+            console.error('Error displaying current price:', error)
+        }
+    }
+
+    const getCurrentPrice = async (symbol: string) => {
+        try {
+            const currentPrice = await fetchCurrentPrice(symbol)
             return currentPrice
         } catch (error) {
             console.error('Error fetching current price:', error)
@@ -69,7 +103,9 @@ function TradingAction() {
 
     const buyStock = async () => {
         try {
-            const buyingPrice = await getCurrentPrice()
+            const buyingPrice = await getCurrentPrice(
+                tradingModalState.symbol || ''
+            )
             if (tradingModalState.symbol && buyingPrice) {
                 const newStock: StockTransaction = {
                     symbol: tradingModalState.symbol!,
@@ -78,7 +114,6 @@ function TradingAction() {
                     quantity: Number(quantity),
                 }
                 const res = await addStockTransaction(newStock)
-                console.log(res)
             } else {
                 alert('Please enter all fields')
                 return
@@ -86,6 +121,14 @@ function TradingAction() {
         } catch (error) {
             console.log('Error buying stock: ', error)
         } finally {
+            // update total portfolio balance & investment
+            updatePortfolioBalance(portfolioInfoDispatch)
+            updatePortfolioInvestment(portfolioInfoDispatch)
+            // update user stocks
+            updateUserStocks(userStocksDispatch)
+            // update history
+            fetchTransactionHistory(historyDispatch)
+
             handleClose()
         }
     }

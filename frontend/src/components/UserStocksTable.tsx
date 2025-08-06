@@ -1,7 +1,8 @@
 import * as React from 'react'
 import { useState, useEffect, type Dispatch, type SetStateAction } from 'react'
 import { alpha } from '@mui/material/styles'
-import { useTradingContext } from '../GlobalContext'
+import { useSelectedStockContext } from '../contexts/SelectedStockContext'
+import { useTradingContext } from '../contexts/TradingContext'
 import {
     Box,
     Table,
@@ -15,15 +16,12 @@ import {
     Toolbar,
     Typography,
     Paper,
-    Checkbox,
-    IconButton,
-    Tooltip,
-    Button,
     Skeleton,
 } from '@mui/material'
 import { visuallyHidden } from '@mui/utils'
-import { useUserStocksContext } from '../GlobalContext'
-import { type UserStockState } from '../GlobalContext'
+import { useUserStocksContext } from '../contexts/UserStocksContext'
+import { type UserStockState } from '../contexts/UserStocksContext'
+import { updateUserStocks } from '../contexts/UserStocksContext'
 
 function descendingComparator<T>(a: T, b: T, orderBy: keyof T) {
     if (b[orderBy] < a[orderBy]) {
@@ -146,9 +144,10 @@ function EnhancedTableHead(props: EnhancedTableProps) {
 interface EnhancedTableToolbarProps {
     numSelected: number
     handleUserOpen: () => void
+    selectedSymbol: string
 }
 function EnhancedTableToolbar(props: EnhancedTableToolbarProps) {
-    const { numSelected, handleUserOpen } = props
+    const { numSelected, handleUserOpen, selectedSymbol } = props
     return (
         <Toolbar
             sx={[
@@ -172,7 +171,7 @@ function EnhancedTableToolbar(props: EnhancedTableToolbarProps) {
                     variant="subtitle1"
                     component="div"
                 >
-                    {numSelected} selected
+                    {selectedSymbol} selected
                 </Typography>
             ) : (
                 <Typography
@@ -184,48 +183,27 @@ function EnhancedTableToolbar(props: EnhancedTableToolbarProps) {
                     Your Holdings
                 </Typography>
             )}
-            {numSelected > 0 && (
-                <Tooltip title="Action">
-                    <Button
-                        sx={{
-                            width: 120,
-                            margin: 1,
-                            color: 'white',
-                            backgroundColor: '#7cbf8e',
-                            '&:focus': {
-                                outline: '2px solid #7cbf8e',
-                                outlineOffset: '2px',
-                            },
-                        }}
-                        onClick={handleUserOpen}
-                    >
-                        BUY / SELL
-                    </Button>
-                </Tooltip>
-            )}
         </Toolbar>
     )
 }
 
-interface UserStocksTableProps {
-    handleStockSelection: Dispatch<SetStateAction<string>>
-}
-export default function UserStocksTable(props: UserStocksTableProps) {
-    const { handleStockSelection } = props
+export default function UserStocksTable() {
+    // const { handleStockSelection } = props
+    const { selectedStockState, selectedStockDispatch } =
+        useSelectedStockContext()
     const [order, setOrder] = React.useState<Order>('asc')
     const [orderBy, setOrderBy] = React.useState<keyof UserStockState>('ticker')
     const [selectedId, setSelectedId] = useState(-1)
     const [page, setPage] = React.useState(0)
     const [dense, setDense] = React.useState(false)
     const [rowsPerPage, setRowsPerPage] = React.useState(3)
-    const [selectedSymbol, setSelectedSymbol] = useState('')
     const { userStocksState, userStocksDispatch } = useUserStocksContext()
 
     const { tradingModalState, tradingModalDispatch } = useTradingContext()
     const handleUserOpen = () => {
         tradingModalDispatch({
             type: 'OPEN_MODAL_WITH_DATA',
-            state: { isOpen: true, symbol: selectedSymbol },
+            state: { isOpen: true, symbol: selectedStockState.selectedStock },
         })
     }
 
@@ -240,12 +218,17 @@ export default function UserStocksTable(props: UserStocksTableProps) {
 
     const handleClick = (event: React.MouseEvent<unknown>, id: number) => {
         const selectedRow = userStocksState.find((row) => row.id === id)
-        setSelectedSymbol(selectedRow ? selectedRow.ticker : '')
-        handleStockSelection(selectedRow ? selectedRow.ticker : '')
         if (id === selectedId) {
             setSelectedId(-1)
+            selectedStockDispatch({
+                type: 'RESET_STOCK',
+            })
         } else {
             setSelectedId(id)
+            selectedStockDispatch({
+                type: 'SELECT_STOCK',
+                state: { selectedStock: selectedRow ? selectedRow.ticker : '' },
+            })
         }
     }
 
@@ -258,10 +241,6 @@ export default function UserStocksTable(props: UserStocksTableProps) {
     ) => {
         setRowsPerPage(parseInt(event.target.value, 10))
         setPage(0)
-    }
-
-    const handleChangeDense = (event: React.ChangeEvent<HTMLInputElement>) => {
-        setDense(event.target.checked)
     }
 
     // Avoid a layout jump when reaching the last page with empty rows.
@@ -278,12 +257,17 @@ export default function UserStocksTable(props: UserStocksTableProps) {
         [order, orderBy, page, rowsPerPage, userStocksState]
     )
 
+    useEffect(() => {
+        updateUserStocks(userStocksDispatch)
+    }, [])
+
     return (
         <Box sx={{ width: '100%', paddingTop: 3 }}>
             <Paper sx={{ width: '100%', mb: 2 }}>
                 <EnhancedTableToolbar
                     numSelected={selectedId === -1 ? 0 : 1}
                     handleUserOpen={handleUserOpen}
+                    selectedSymbol={selectedStockState.selectedStock}
                 />
                 <TableContainer>
                     <Table
