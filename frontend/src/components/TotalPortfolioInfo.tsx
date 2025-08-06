@@ -22,11 +22,12 @@ function TotalPortfolioInfo() {
     return (
         <div style={{ textAlign: 'left', paddingTop: 10, paddingBottom: 20 }}>
             <Typography variant="h4">
-                Total Portfolio Balance: ${portfolioInfoState.portfolioBalance}
+                Total Portfolio Balance: $
+                {Number(portfolioInfoState.portfolioBalance).toFixed(2)}
             </Typography>
             <Typography variant="h5" color="gray" mt={1}>
                 Total Portfolio Investment: $
-                {portfolioInfoState.portfolioInvestment}
+                {Number(portfolioInfoState.portfolioInvestment).toFixed(2)}
             </Typography>
         </div>
     )

@@ -75,11 +75,13 @@ export const fetchTransactions = async (): Promise<TransactionData[]> => {
 export interface PortfolioData {
     holdings: []
     total_net_investment: string
+    total_portfolio_balance: string
 }
 
 export const fetchTotalPortfolioBalance = async (): Promise<PortfolioData> => {
     try {
         const response = await API.get('/api/portfolio')
+        console.log(response.data)
         return response.data
     } catch (error) {
         console.error('Error fetching transactions:', error)

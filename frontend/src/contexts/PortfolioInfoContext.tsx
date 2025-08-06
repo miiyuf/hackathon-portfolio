@@ -1,4 +1,4 @@
-import { useContext, createContext, useReducer, useEffect } from 'react'
+import { useContext, createContext, useReducer } from 'react'
 import { fetchTotalPortfolioBalance } from '../api/stocks'
 
 interface PortfolioInfoState {
@@ -65,7 +65,7 @@ export const updatePortfolioBalance = async (
     portfolioInfoDispatch({
         type: 'UPDATE_BALANCE',
         state: {
-            portfolioBalance: portfolioData.total_net_investment,
+            portfolioBalance: portfolioData.total_portfolio_balance,
             portfolioInvestment: '',
         },
     })

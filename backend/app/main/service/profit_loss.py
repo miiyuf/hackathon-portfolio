@@ -31,6 +31,8 @@ def get_profit_loss():
     holdings = fetch_holdings()
     logger.info(f"Fetched {len(holdings) if holdings else 0} holdings from database")
     logger.debug(f"Raw holdings data: {holdings}")
+
+
     profit_loss_data = []
 
     if not holdings:

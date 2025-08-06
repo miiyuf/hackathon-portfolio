@@ -64,7 +64,9 @@ def fetch_holdings(include_purchase_price=False):
             SELECT 
                 s.symbol,
                 sm.name,
-                SUM(CASE WHEN s.action = 'buy' THEN s.quantity ELSE -s.quantity END) AS total_quantity
+                SUM(CASE WHEN s.action = 'buy' THEN s.quantity ELSE -s.quantity END) AS total_quantity,
+                SUM(CASE WHEN s.action = 'buy' THEN s.purchase_price * s.quantity ELSE 0 END) AS total_buy_value,
+                SUM(CASE WHEN s.action = 'sell' THEN s.purchase_price * s.quantity ELSE 0 END) AS total_sell_value
             from transactions s
             LEFT JOIN stock_master sm ON s.symbol = sm.symbol
             GROUP BY s.symbol, sm.name
