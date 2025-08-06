@@ -89,7 +89,7 @@ const headCells: readonly HeadCell[] = [
         id: 'profitLoss',
         numeric: true,
         disablePadding: false,
-        label: 'Profit / Loss ($)',
+        label: 'P&L ($)',
     },
 ]
 
@@ -319,7 +319,23 @@ export default function UserStocksTable() {
                                                       row.currentPrice
                                                   ).toFixed(2)}
                                               </TableCell>
-                                              <TableCell align="right">
+                                              <TableCell
+                                                  align="right"
+                                                  style={{
+                                                      color:
+                                                          Number(
+                                                              row.profitLoss
+                                                          ) < 0 ||
+                                                          Object.is(
+                                                              Number(
+                                                                  row.profitLoss
+                                                              ),
+                                                              -0
+                                                          )
+                                                              ? 'red'
+                                                              : 'green',
+                                                  }}
+                                              >
                                                   {row.profitLoss}
                                               </TableCell>
                                           </TableRow>

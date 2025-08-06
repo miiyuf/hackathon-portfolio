@@ -10,7 +10,7 @@ export interface HoldingData {
     total_quantity: number
     purchase_price: number
     current_price: number
-    profit_loss: number
+    unrealized_profit_loss: string
 }
 
 export const fetchPortfolioData = async (): Promise<HoldingData[]> => {
@@ -89,12 +89,13 @@ export const fetchTotalPortfolioBalance = async (): Promise<PortfolioData> => {
     }
 }
 
-// export const fetchProfitLoss = async (): Promise<HoldingData[]> => {
-//     try {
-//         const response = await axios.get(`${API_URL}/profit_loss`)
-//         return response.data
-//     } catch (error) {
-//         console.error('Error fetching profit/loss data:', error)
-//         throw error
-//     }
-// }
+export const fetchProfitLoss = async (): Promise<HoldingData[]> => {
+    try {
+        const response = await axios.get(`${API}/profit_loss`)
+        console.log(response.data)
+        return response.data
+    } catch (error) {
+        console.error('Error fetching profit/loss data:', error)
+        throw error
+    }
+}

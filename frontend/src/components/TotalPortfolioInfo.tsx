@@ -21,7 +21,15 @@ function TotalPortfolioInfo() {
 
     return (
         <div style={{ textAlign: 'left', paddingTop: 10, paddingBottom: 20 }}>
-            <Typography variant="h4">
+            <Typography
+                variant="h4"
+                style={{
+                    color:
+                        Number(portfolioInfoState.portfolioBalance) > 0
+                            ? 'green'
+                            : 'red',
+                }}
+            >
                 Total Portfolio Balance: $
                 {Number(portfolioInfoState.portfolioBalance).toFixed(2)}
             </Typography>
