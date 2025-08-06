@@ -9,7 +9,7 @@ export interface UserStockState {
     qty: number
     costPrice: number
     currentPrice: number
-    profitLoss: number
+    profitLoss: string
 }
 
 interface UserStocksContextType {
@@ -64,7 +64,8 @@ export const updateUserStocks = async (
                 qty: holding.total_quantity,
                 costPrice: holding.purchase_price,
                 currentPrice: holding.current_price,
-                profitLoss: holding.profit_loss,
+                profitLoss:
+                    Number(holding.unrealized_profit_loss).toFixed(2) || 'N/A',
             }
         })
         userStocksDispatch({ type: 'INIT_STOCK', state: portfolioData })

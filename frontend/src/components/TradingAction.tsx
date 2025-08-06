@@ -173,8 +173,17 @@ function TradingAction() {
             }
         } catch (error) {
             console.log('Error selling stock: ', error)
-            alert('An error occurred while selling the stock. Please try again.')
+            alert(
+                'An error occurred while selling the stock. Please try again.'
+            )
         } finally {
+            // update total portfolio balance & investment
+            updatePortfolioBalance(portfolioInfoDispatch)
+            updatePortfolioInvestment(portfolioInfoDispatch)
+            // update user stocks
+            updateUserStocks(userStocksDispatch)
+            // update history
+            fetchTransactionHistory(historyDispatch)
             handleClose()
         }
     }
@@ -182,6 +191,8 @@ function TradingAction() {
     useEffect(() => {
         if (action === 'Buy' || action === 'Sell') {
             setButtonText(action)
+        } else {
+            setButtonText('Buy / Sell')
         }
     }, [action])
 
@@ -286,7 +297,7 @@ function TradingAction() {
                                     action === 'Buy'
                                         ? buyStock
                                         : () => {
-                                              sellStock();
+                                              sellStock()
                                           }
                                 }
                                 variant="contained"
