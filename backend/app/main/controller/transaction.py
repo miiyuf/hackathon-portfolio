@@ -1,4 +1,4 @@
-# 既存のコードを修正
+# Modify existing code
 
 def get_transactions():
     # ...既存のコード...
