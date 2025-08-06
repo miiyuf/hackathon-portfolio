@@ -4,7 +4,7 @@ import logging
 import time
 
 logger = logging.getLogger(__name__)
-currentprice_bp = Blueprint('price', __name__, url_prefix='/api')
+currentprice_bp = Blueprint('currentprice', __name__, url_prefix='/api')
 
 @currentprice_bp.route('/current-prices', methods=['GET'])
 def get_current_prices():

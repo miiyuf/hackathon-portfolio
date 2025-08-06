@@ -64,6 +64,7 @@ app.register_blueprint(transaction_bp)
 app.register_blueprint(price_bp)
 app.register_blueprint(portfolio_bp)
 app.register_blueprint(profitloss_bp)
+app.register_blueprint(currentprice_bp)
 
 # Background scheduler to update current prices every 5 minutes
 scheduler = BackgroundScheduler()
