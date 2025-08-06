@@ -3,7 +3,6 @@ import axios from 'axios'
 const API = axios.create({
     baseURL: import.meta.env.VITE_APP_API_URL, // || 'http://localhost:8000',
 })
-
 export interface HoldingData {
     symbol: string
     name: string
@@ -48,6 +47,18 @@ export const fetchCurrentPrice = async (symbol: string): Promise<number> => {
         return response.data.price
     } catch (error) {
         console.error(`Error fetching price for ${symbol}:`, error)
+        throw error
+    }
+}
+
+export const fetchHoldingsQuantity = async (symbol: string): Promise<number> => {
+    try {
+        const response = await API.get(`/api/holdings`)
+        const holdings = response.data
+        const holding = holdings.find((h: HoldingData) => h.symbol === symbol)
+        return holding ? holding.total_quantity : 0
+    } catch (error) {
+        console.error(`Error fetching holdings quantity for ${symbol}:`, error)
         throw error
     }
 }
