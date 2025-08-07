@@ -20,6 +20,8 @@ import {
     Alert
 } from '@mui/material'
 import { API } from '../api/stocks'
+import TableSortLabel from '@mui/material/TableSortLabel';
+
 
 interface StockData {
     symbol: string
@@ -50,6 +52,45 @@ function Market() {
         message: '',
         severity: 'info'
     })
+
+    const [sortConfig, setSortConfig] = useState<{ key: keyof StockData, direction: 'asc' | 'desc' } | null>(null)
+
+    const sortedStocks = React.useMemo(() => {
+    if (!sortConfig) return stocks
+
+    const sorted = [...stocks].sort((a, b) => {
+        const aVal = a[sortConfig.key]
+        const bVal = b[sortConfig.key]
+
+        if (typeof aVal === 'number' && typeof bVal === 'number') {
+            return sortConfig.direction === 'asc' ? aVal - bVal : bVal - aVal
+        }
+
+        if (typeof aVal === 'string' && typeof bVal === 'string') {
+            return sortConfig.direction === 'asc'
+                ? aVal.localeCompare(bVal)
+                : bVal.localeCompare(aVal)
+        }
+
+        return 0
+    })
+
+    return sorted
+}, [stocks, sortConfig])
+
+    const handleSort = (key: keyof StockData) => {
+    setSortConfig(prev => {
+        if (prev?.key === key) {
+            return {
+                key,
+                direction: prev.direction === 'asc' ? 'desc' : 'asc'
+            }
+        }
+        return { key, direction: 'asc' }
+    })
+}
+
+
 
     useEffect(() => {
         const fetchTopStocks = async () => {
@@ -148,7 +189,7 @@ function Market() {
     return (
         <div className="internal-tab">
             <Typography variant="h4" gutterBottom sx={{ fontWeight: 'bold', mb: 3 }}>
-                Tokyo Stock Exchange Market
+                TOPIX Large70
             </Typography>
 
             {loading ? (
@@ -162,18 +203,81 @@ function Market() {
                     <Table sx={{ minWidth: 650 }} aria-label="stock market table">
                         <TableHead>
                             <TableRow>
-                                <TableCell>Symbol</TableCell>
-                                <TableCell>Company</TableCell>
-                                <TableCell align="right">Price ($)</TableCell>
-                                <TableCell align="right">Change</TableCell>
-                                <TableCell align="right">Change %</TableCell>
-                                <TableCell align="right">Volume</TableCell>
-                                <TableCell align="center">Actions</TableCell>
-                            </TableRow>
+                                
+                                <TableCell sortDirection={sortConfig?.key === 'symbol' ? sortConfig.direction : false}>
+                                <TableSortLabel
+                                    active={sortConfig?.key === 'symbol'}
+                                    direction={sortConfig?.key === 'symbol' ? sortConfig.direction : 'asc'}
+                                    onClick={() => handleSort('symbol')}
+                                    style={{ cursor: 'pointer' }}
+                                >
+                                    Symbol
+                                </TableSortLabel>
+                                </TableCell>
+
+                                <TableCell sortDirection={sortConfig?.key === 'name' ? sortConfig.direction : false}>
+                                <TableSortLabel
+                                    active={sortConfig?.key === 'name'}
+                                    direction={sortConfig?.key === 'name' ? sortConfig.direction : 'asc'}
+                                    onClick={() => handleSort('name')}
+                                    style={{ cursor: 'pointer' }}
+                                >
+                                    Company
+                                </TableSortLabel>
+                                </TableCell>
+
+                                <TableCell align="right" sortDirection={sortConfig?.key === 'price' ? sortConfig.direction : false}>
+                                <TableSortLabel
+                                    active={sortConfig?.key === 'price'}
+                                    direction={sortConfig?.key === 'price' ? sortConfig.direction : 'asc'}
+                                    onClick={() => handleSort('price')}
+                                    style={{ cursor: 'pointer' }}
+                                >
+                                    Price ($)
+                                </TableSortLabel>
+                                </TableCell>
+
+                                <TableCell align="right" sortDirection={sortConfig?.key === 'change' ? sortConfig.direction : false}>
+                                <TableSortLabel
+                                    active={sortConfig?.key === 'change'}
+                                    direction={sortConfig?.key === 'change' ? sortConfig.direction : 'asc'}
+                                    onClick={() => handleSort('change')}
+                                    style={{ cursor: 'pointer' }}
+                                >
+                                    Change
+                                </TableSortLabel>
+                                </TableCell>
+
+                                <TableCell align="right" sortDirection={sortConfig?.key === 'changePercent' ? sortConfig.direction : false}>
+                                <TableSortLabel
+                                    active={sortConfig?.key === 'changePercent'}
+                                    direction={sortConfig?.key === 'changePercent' ? sortConfig.direction : 'asc'}
+                                    onClick={() => handleSort('changePercent')}
+                                    style={{ cursor: 'pointer' }}
+                                >
+                                    Change %
+                                </TableSortLabel>
+                                </TableCell>
+
+                                <TableCell align="right" sortDirection={sortConfig?.key === 'volume' ? sortConfig.direction : false}>
+                                <TableSortLabel
+                                    active={sortConfig?.key === 'volume'}
+                                    direction={sortConfig?.key === 'volume' ? sortConfig.direction : 'asc'}
+                                    onClick={() => handleSort('volume')}
+                                    style={{ cursor: 'pointer' }}
+                                >
+                                    Volume
+                                </TableSortLabel>
+                                </TableCell>
+
+                                <TableCell align="center">
+                                Actions
+                                </TableCell>
+                                                            </TableRow>
                         </TableHead>
                         <TableBody>
                             {Array.isArray(stocks) && stocks.length > 0 ? (
-                                stocks.map((stock) => (
+                                sortedStocks.map((stock) => (
                                     <TableRow
                                         key={stock.symbol}
                                         sx={{ '&:last-child td, &:last-child th': { border: 0 } }}

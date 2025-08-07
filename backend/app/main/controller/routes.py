@@ -32,8 +32,7 @@ def load_japan_symbols():
     try:
         csv_path = os.path.join(os.path.dirname(__file__), 'data_j.csv')
         logger.warning(f"Looking for CSV at absolute path: {os.path.abspath(csv_path)}")
-        logger.info(f"[DEBUG] CSV absolute path: {os.path.abspath(csv_path)}", file=sys.stderr)
-        logger.info(f"[DEBUG] Exists? {os.path.exists(csv_path)}", file=sys.stderr)
+        logger.info(f"[DEBUG] Exists? {os.path.exists(csv_path)}")
         current_dir = os.getcwd()
         logger.warning(f"Current working directory: {current_dir}")
         
@@ -43,10 +42,10 @@ def load_japan_symbols():
                     '7974.T', '9433.T', '8306.T', '8316.T', '6501.T']
         
         df = pd.read_csv(csv_path, encoding='utf-8')
+        logger.info(f"CSV loaded with {len(df)} rows")
         
-        prime_stocks = df[
-        (df['市場・商品区分'].str.contains('プライム（内国株式）', na=False)) & (df['規模区分'] == 'TOPIX Large')
-        ]
+        prime_stocks = df[df['規模区分'] == 'TOPIX Large70']
+        logger.info(f"df: {len(prime_stocks)}")
         
         selected_stocks = prime_stocks[['コード', '銘柄名']]
         
