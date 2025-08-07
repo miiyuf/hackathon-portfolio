@@ -127,7 +127,7 @@ function LineGraph() {
                     individual holding
                 </ToggleButton>
                 <ToggleButton value="portfolio" aria-label="right aligned">
-                    total portfolio balance
+                    Portfolio P&L
                 </ToggleButton>
             </ToggleButtonGroup>
         </div>
