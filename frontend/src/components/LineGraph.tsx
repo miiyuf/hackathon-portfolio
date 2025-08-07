@@ -98,11 +98,18 @@ function LineGraph() {
                             dateFormatter.format(value),
                     },
                 ]}
-                sx={{
-                    '.MuiAreaElement-root': {
-                        fill: 'rgba(101, 199, 103, 0.5)',
+                yAxis={[
+                    {
+                        colorMap: {
+                            type: 'piecewise',
+                            thresholds: [0],
+                            colors: [
+                                'rgba(199, 101, 101, 0.5)',
+                                'rgba(101, 199, 103, 0.5)',
+                            ],
+                        },
                     },
-                }}
+                ]}
             />
             <ToggleButtonGroup
                 value={lineChartView}
