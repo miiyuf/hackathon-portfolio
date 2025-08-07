@@ -103,7 +103,6 @@ export const updatePortfolioPercentage = async (
     }>
 ) => {
     const portfolioData = await fetchTotalPortfolioBalance()
-    console.log(portfolioData.profit_loss)
     portfolioInfoDispatch({
         type: 'UPDATE_PL',
         state: {

@@ -95,7 +95,6 @@ export interface PortfolioData {
 export const fetchTotalPortfolioBalance = async (): Promise<PortfolioData> => {
     try {
         const response = await API.get('/api/portfolio')
-        console.log(response.data)
         return response.data
     } catch (error) {
         console.error('Error fetching transactions:', error)
@@ -118,7 +117,6 @@ export const fetchLongTermStockHistory = async (
 export const fetchLongTermProfitLoss = async (days: number): Promise<[]> => {
     try {
         const response = await API.get(`/api/long_term_balance/${days}`)
-        console.log(response)
         return response.data.long_term_balance
     } catch (error) {
         console.error('Error fetching profit/loss data:', error)
