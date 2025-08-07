@@ -50,10 +50,10 @@ const theme = createTheme({
     success: {
       main: '#64A36F',
     },
-    sidebar: {
-      main: '#0A1622',
-      contrastText: '#F4F1E8',
-    },
+    // sidebar: {
+    //   main: '#0A1622',
+    //   contrastText: '#F4F1E8',
+    // },
   },
   components: {
     MuiCssBaseline: {
@@ -120,8 +120,8 @@ const theme = createTheme({
 
 function App() {
     return (
-        <ThemeProvider theme={theme}>
-            <CssBaseline />
+        // <ThemeProvider theme={theme}>
+            // <CssBaseline />
             <CurrentPricesProvider>
                 <div className="flex">
                     <Sidebar />
@@ -133,7 +133,7 @@ function App() {
                     <TradingAction />
                 </div>
             </CurrentPricesProvider>
-        </ThemeProvider>
+        // {/* </ThemeProvider> */}
     );
 }
 

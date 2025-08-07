@@ -1,5 +1,4 @@
-import React, { useState } from 'react'
-import { useEffect } from 'react'
+import React, { useState, useEffect } from 'react'
 import {
     Paper,
     Table,
@@ -18,7 +17,6 @@ import { visuallyHidden } from '@mui/utils'
 import { useHistoryContext } from '../contexts/HistoryContext'
 import { fetchTransactionHistory } from '../contexts/HistoryContext'
 
-// ファイルの先頭あたりに列識別子の定数を追加
 const COLUMN_IDS = {
   TICKER: 'ticker',
   COMPANY: 'company',
@@ -29,7 +27,6 @@ const COLUMN_IDS = {
   DATE: 'date',
 } as const;
 
-// 型の定義を修正
 type ColumnId = typeof COLUMN_IDS[keyof typeof COLUMN_IDS];
 
 interface Column {
@@ -56,21 +53,31 @@ function UserHistoryTable() {
     const [order, setOrder] = useState<Order>('desc')
     const [orderBy, setOrderBy] = useState<keyof TransactionHistory>(COLUMN_IDS.DATE)
     const [companyFilter, setCompanyFilter] = useState<string | null>(null)
-    const [actionFilter, setActionFilter] = useState<string | null>(null) // Action用のフィルター状態を追加
+    const [actionFilter, setActionFilter] = useState<string | null>(null)
+    const [page, setPage] = useState(0)
+    const [rowsPerPage, setRowsPerPage] = useState(10)
+
+    const exchangeRate = 0.0068
+
+    const formatPrice = (ticker: string, price: number) => {
+        const isJPY = ticker.endsWith('.T')
+        const priceUSD = isJPY ? price * exchangeRate : price
+        return priceUSD.toLocaleString('en-US', { style: 'currency', currency: 'USD' })
+    }
 
     const handleCompanyClick = (company: string) => {
         setCompanyFilter(currentFilter => currentFilter === company ? null : company)
         setPage(0)
     }
 
-    const handleClearFilters = () => {
-        setCompanyFilter(null)
-        setActionFilter(null)
-    }
-
     const handleActionClick = (action: string) => {
         setActionFilter(currentFilter => currentFilter === action ? null : action)
         setPage(0)
+    }
+
+    const handleClearFilters = () => {
+        setCompanyFilter(null)
+        setActionFilter(null)
     }
 
     const columns: readonly Column[] = [
@@ -100,7 +107,6 @@ function UserHistoryTable() {
             label: 'Total Amount ($)',
             minWidth: 100,
             align: 'right',
-            format: (value: number) => value.toFixed(2),
         },
         {
             id: COLUMN_IDS.DATE,
@@ -116,26 +122,18 @@ function UserHistoryTable() {
             const dateB = new Date(b[orderBy] as string)
             return dateB.getTime() - dateA.getTime()
         }
-
-        if (b[orderBy] < a[orderBy]) {
-            return -1
-        }
-        if (b[orderBy] > a[orderBy]) {
-            return 1
-        }
+        if (b[orderBy] < a[orderBy]) return -1
+        if (b[orderBy] > a[orderBy]) return 1
         return 0
     }
 
     function getComparator<Key extends keyof any>(
         order: Order,
         orderBy: Key
-    ): (
-        a: { [key in Key]: number | string },
-        b: { [key in Key]: number | string }
-    ) => number {
+    ) {
         return order === 'desc'
-            ? (a, b) => descendingComparator(a, b, orderBy)
-            : (a, b) => -descendingComparator(a, b, orderBy)
+            ? (a: { [key in Key]: number | string }, b: { [key in Key]: number | string }) => descendingComparator(a, b, orderBy)
+            : (a: { [key in Key]: number | string }, b: { [key in Key]: number | string }) => -descendingComparator(a, b, orderBy)
     }
 
     const handleRequestSort = (property: Column['id']) => {
@@ -146,34 +144,27 @@ function UserHistoryTable() {
 
     useEffect(() => {
         fetchTransactionHistory(historyDispatch)
-    }, [])
+    }, [historyDispatch])
 
-    const [page, setPage] = React.useState(0)
-    const [rowsPerPage, setRowsPerPage] = React.useState(10)
     const handleChangePage = (event: unknown, newPage: number) => {
         setPage(newPage)
     }
 
-    const handleChangeRowsPerPage = (
-        event: React.ChangeEvent<HTMLInputElement>
-    ) => {
+    const handleChangeRowsPerPage = (event: React.ChangeEvent<HTMLInputElement>) => {
         setRowsPerPage(+event.target.value)
         setPage(0)
     }
 
     const filteredAndSortedData = React.useMemo(() => {
-        let data = [...historyState];
-        
+        let data = [...historyState]
         if (companyFilter) {
-            data = data.filter(item => item.company === companyFilter);
+            data = data.filter(item => item.company === companyFilter)
         }
-        
         if (actionFilter) {
-            data = data.filter(item => item.action === actionFilter);
+            data = data.filter(item => item.action === actionFilter)
         }
-        
-        return data.sort(getComparator(order, orderBy));
-    }, [historyState, order, orderBy, companyFilter, actionFilter]);
+        return data.sort(getComparator(order, orderBy))
+    }, [historyState, order, orderBy, companyFilter, actionFilter])
 
     return (
         <Paper sx={{ width: '100%', overflow: 'hidden' }}>
@@ -181,7 +172,7 @@ function UserHistoryTable() {
                 <Box sx={{ p: 1, display: 'flex', alignItems: 'center', backgroundColor: 'rgba(0, 0, 255, 0.05)' }}>
                     <Typography variant="body2" sx={{ mr: 1 }}>Filtered by:</Typography>
                     {companyFilter && (
-                        <Chip 
+                        <Chip
                             label={`Company: ${companyFilter}`}
                             onDelete={() => setCompanyFilter(null)}
                             color="primary"
@@ -190,7 +181,7 @@ function UserHistoryTable() {
                         />
                     )}
                     {actionFilter && (
-                        <Chip 
+                        <Chip
                             label={`Action: ${actionFilter}`}
                             onDelete={() => setActionFilter(null)}
                             color="secondary"
@@ -199,7 +190,7 @@ function UserHistoryTable() {
                         />
                     )}
                     {(companyFilter && actionFilter) && (
-                        <Chip 
+                        <Chip
                             label="Clear All"
                             onDelete={handleClearFilters}
                             color="default"
@@ -208,7 +199,7 @@ function UserHistoryTable() {
                     )}
                 </Box>
             )}
-            
+
             <TableContainer sx={{ maxHeight: 440 }}>
                 <Table stickyHeader aria-label="sticky table">
                     <TableHead>
@@ -218,30 +209,17 @@ function UserHistoryTable() {
                                     key={column.id}
                                     align={column.align}
                                     style={{ minWidth: column.minWidth }}
-                                    sortDirection={
-                                        orderBy === column.id ? order : false
-                                    }
+                                    sortDirection={orderBy === column.id ? order : false}
                                 >
                                     <TableSortLabel
                                         active={orderBy === column.id}
-                                        direction={
-                                            orderBy === column.id
-                                                ? order
-                                                : 'asc'
-                                        }
-                                        onClick={() =>
-                                            handleRequestSort(column.id)
-                                        }
+                                        direction={orderBy === column.id ? order : 'asc'}
+                                        onClick={() => handleRequestSort(column.id)}
                                     >
                                         {column.label}
                                         {orderBy === column.id ? (
-                                            <Box
-                                                component="span"
-                                                sx={visuallyHidden}
-                                            >
-                                                {order === 'desc'
-                                                    ? 'sorted descending'
-                                                    : 'sorted ascending'}
+                                            <Box component="span" sx={visuallyHidden}>
+                                                {order === 'desc' ? 'sorted descending' : 'sorted ascending'}
                                             </Box>
                                         ) : null}
                                     </TableSortLabel>
@@ -251,79 +229,67 @@ function UserHistoryTable() {
                     </TableHead>
                     <TableBody>
                         {filteredAndSortedData
-                            .slice(
-                                page * rowsPerPage,
-                                page * rowsPerPage + rowsPerPage
-                            )
-                            .map((row) => {
-                                return (
-                                    <TableRow
-                                        hover
-                                        role="checkbox"
-                                        tabIndex={-1}
-                                        key={row.id}
-                                    >
-                                        {columns.map((column) => {
-                                            const value = row[column.id];
-                                            
-                                            if (column.id === COLUMN_IDS.COMPANY) {
-                                                return (
-                                                    <TableCell
-                                                        key={column.id}
-                                                        align={column.align}
-                                                        onClick={() => handleCompanyClick(value as string)}
-                                                        sx={{
-                                                            cursor: 'pointer',
-                                                            fontWeight: companyFilter === value ? 'bold' : 'normal',
-                                                            backgroundColor: companyFilter === value ? 'rgba(0, 0, 255, 0.1)' : 'inherit',
-                                                            '&:hover': {
-                                                                backgroundColor: 'rgba(0, 0, 255, 0.05)'
-                                                            }
-                                                        }}
-                                                    >
-                                                        {value}
-                                                    </TableCell>
-                                                );
-                                            }
-                                            
-                                            if (column.id === COLUMN_IDS.ACTION) {
-                                                return (
-                                                    <TableCell
-                                                        key={column.id}
-                                                        align={column.align}
-                                                        onClick={() => handleActionClick(value as string)}
-                                                        sx={{
-                                                            cursor: 'pointer',
-                                                            fontWeight: actionFilter === value ? 'bold' : 'normal',
-                                                            backgroundColor: actionFilter === value ? 'rgba(76, 175, 80, 0.1)' : 'inherit',
-                                                            '&:hover': {
-                                                                backgroundColor: 'rgba(76, 175, 80, 0.05)'
-                                                            }
-                                                        }}
-                                                    >
-                                                        {value}
-                                                    </TableCell>
-                                                );
-                                            }
-                                            
+                            .slice(page * rowsPerPage, page * rowsPerPage + rowsPerPage)
+                            .map((row) => (
+                                <TableRow hover role="checkbox" tabIndex={-1} key={row.id}>
+                                    {columns.map((column) => {
+                                        const value = row[column.id]
+                                        if (column.id === COLUMN_IDS.COMPANY) {
                                             return (
                                                 <TableCell
                                                     key={column.id}
                                                     align={column.align}
+                                                    onClick={() => handleCompanyClick(value as string)}
+                                                    sx={{
+                                                        cursor: 'pointer',
+                                                        fontWeight: companyFilter === value ? 'bold' : 'normal',
+                                                        backgroundColor: companyFilter === value ? 'rgba(0, 0, 255, 0.1)' : 'inherit',
+                                                        '&:hover': { backgroundColor: 'rgba(0, 0, 255, 0.05)' },
+                                                    }}
                                                 >
-                                                    {column.format &&
-                                                    typeof value === 'number'
-                                                        ? column.format(value)
-                                                        : value}
+                                                    {value}
                                                 </TableCell>
                                             )
-                                        })}
-                                    </TableRow>
-                                )
-                            })}
+                                        }
+                                        if (column.id === COLUMN_IDS.ACTION) {
+                                            return (
+                                                <TableCell
+                                                    key={column.id}
+                                                    align={column.align}
+                                                    onClick={() => handleActionClick(value as string)}
+                                                    sx={{
+                                                        cursor: 'pointer',
+                                                        fontWeight: actionFilter === value ? 'bold' : 'normal',
+                                                        backgroundColor: actionFilter === value ? 'rgba(76, 175, 80, 0.1)' : 'inherit',
+                                                        '&:hover': { backgroundColor: 'rgba(76, 175, 80, 0.05)' },
+                                                    }}
+                                                >
+                                                    {value}
+                                                </TableCell>
+                                            )
+                                        }
+                                        if (
+                                            (column.id === COLUMN_IDS.PURCHASE_PRICE || column.id === COLUMN_IDS.TOTAL_AMOUNT) &&
+                                            typeof value === 'number'
+                                        ) {
+                                            return (
+                                                <TableCell key={column.id} align={column.align}>
+                                                    {formatPrice(row.ticker, value)}
+                                                </TableCell>
+                                            )
+                                        }
+                                        return (
+                                            <TableCell key={column.id} align={column.align}>
+                                                {column.format && typeof value === 'number' ? column.format(value) : value}
+                                            </TableCell>
+                                        )
+                                    })}
+                                </TableRow>
+                            ))}
                     </TableBody>
                 </Table>
             </TableContainer>
+
             <TablePagination
                 rowsPerPageOptions={[10, 25, 100]}
                 component="div"

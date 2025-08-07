@@ -1,8 +1,14 @@
 import * as React from 'react'
-import { useState, useEffect, type Dispatch, type SetStateAction } from 'react'
+import { useState, useEffect } from 'react'
 import { alpha } from '@mui/material/styles'
 import { useSelectedStockContext } from '../contexts/SelectedStockContext'
 import { useTradingContext } from '../contexts/TradingContext'
+import {
+    updatePortfolioBalance,
+    updatePortfolioInvestment,
+    updatePortfolioPercentage,
+    usePortfolioInfoContext,
+} from '../contexts/PortfolioInfoContext'
 import {
     Box,
     Table,
@@ -20,12 +26,14 @@ import {
 } from '@mui/material'
 import { visuallyHidden } from '@mui/utils'
 import { useUserStocksContext } from '../contexts/UserStocksContext'
-import { type UserStockState } from '../contexts/UserStocksContext'
 import { updateUserStocks } from '../contexts/UserStocksContext'
 import { useCurrentPrices } from '../contexts/CurrentPricesContext'
 
-
 function descendingComparator<T>(a: T, b: T, orderBy: keyof T) {
+    if (orderBy === 'profitLoss') {
+        // profitLossは計算結果で比較するため特別扱い
+        return (b as any)[orderBy] - (a as any)[orderBy]
+    }
     if (b[orderBy] < a[orderBy]) {
         return -1
     }
@@ -57,42 +65,12 @@ interface HeadCell {
 }
 
 const headCells: readonly HeadCell[] = [
-    {
-        id: 'ticker',
-        numeric: false,
-        disablePadding: false,
-        label: 'Ticker',
-    },
-    {
-        id: 'stockName',
-        numeric: false,
-        disablePadding: false,
-        label: 'Stock Name',
-    },
-    {
-        id: 'qty',
-        numeric: true,
-        disablePadding: false,
-        label: 'Quantity',
-    },
-    {
-        id: 'costPrice',
-        numeric: true,
-        disablePadding: false,
-        label: 'Cost Price ($)',
-    },
-    {
-        id: 'currentPrice',
-        numeric: true,
-        disablePadding: false,
-        label: 'Current Price ($)',
-    },
-    {
-        id: 'profitLoss',
-        numeric: true,
-        disablePadding: false,
-        label: 'P&L ($)',
-    },
+    { id: 'ticker', numeric: false, disablePadding: false, label: 'Ticker' },
+    { id: 'stockName', numeric: false, disablePadding: false, label: 'Stock Name' },
+    { id: 'qty', numeric: true, disablePadding: false, label: 'Quantity' },
+    { id: 'costPrice', numeric: true, disablePadding: false, label: 'Cost Price ($)' },
+    { id: 'currentPrice', numeric: true, disablePadding: false, label: 'Current Price ($)' },
+    { id: 'profitLoss', numeric: true, disablePadding: false, label: 'P&L ($)' },
 ]
 
 interface EnhancedTableProps {
@@ -130,9 +108,7 @@ function EnhancedTableHead(props: EnhancedTableProps) {
                             {headCell.label}
                             {orderBy === headCell.id ? (
                                 <Box component="span" sx={visuallyHidden}>
-                                    {order === 'desc'
-                                        ? 'sorted descending'
-                                        : 'sorted ascending'}
+                                    {order === 'desc' ? 'sorted descending' : 'sorted ascending'}
                                 </Box>
                             ) : null}
                         </TableSortLabel>
@@ -167,21 +143,11 @@ function EnhancedTableToolbar(props: EnhancedTableToolbarProps) {
             ]}
         >
             {numSelected > 0 ? (
-                <Typography
-                    sx={{ flex: '1 1 100%' }}
-                    color="inherit"
-                    variant="subtitle1"
-                    component="div"
-                >
+                <Typography sx={{ flex: '1 1 100%' }} color="inherit" variant="subtitle1" component="div">
                     {selectedSymbol} selected
                 </Typography>
             ) : (
-                <Typography
-                    sx={{ flex: '1 1 100%' }}
-                    variant="h6"
-                    id="tableTitle"
-                    component="div"
-                >
+                <Typography sx={{ flex: '1 1 100%' }} variant="h6" id="tableTitle" component="div">
                     Your Holdings
                 </Typography>
             )}
@@ -189,20 +155,22 @@ function EnhancedTableToolbar(props: EnhancedTableToolbarProps) {
     )
 }
 
+const exchangeRate = 0.0068
+
 export default function UserStocksTable() {
-    // const { handleStockSelection } = props
-    const { selectedStockState, selectedStockDispatch } =
-        useSelectedStockContext()
+    const { portfolioInfoDispatch, portfolioInfoState } =
+        usePortfolioInfoContext()
+    const { selectedStockState, selectedStockDispatch } = useSelectedStockContext()
     const [order, setOrder] = React.useState<Order>('asc')
     const [orderBy, setOrderBy] = React.useState<keyof UserStockState>('ticker')
     const [selectedId, setSelectedId] = useState(-1)
     const [page, setPage] = React.useState(0)
-    const [dense, setDense] = React.useState(false)
+    const [dense] = React.useState(false)
     const [rowsPerPage, setRowsPerPage] = React.useState(3)
     const { userStocksState, userStocksDispatch } = useUserStocksContext()
     const { prices } = useCurrentPrices()
+    const { tradingModalDispatch } = useTradingContext()
 
-    const { tradingModalState, tradingModalDispatch } = useTradingContext()
     const handleUserOpen = () => {
         tradingModalDispatch({
             type: 'OPEN_MODAL_WITH_DATA',
@@ -211,13 +179,29 @@ export default function UserStocksTable() {
     }
 
     const stocksWithPrices = React.useMemo(() => {
-        return userStocksState.map(stock => ({
-            ...stock,
-            currentPrice: prices[stock.ticker] ?? stock.currentPrice ?? 0,
-        }))
-    }, [userStocksState, prices])
 
-    
+        return userStocksState.map((stock) => {
+            // Get current price from prices context or fallback to existing value
+            const currentPriceRaw = prices[stock.ticker] ?? stock.currentPrice ?? 0
+
+            // Determine if JPY ticker
+            const isJPY = stock.ticker.endsWith('.T')
+
+            // Convert costPrice and currentPrice to USD if needed
+            const costPriceUSD = isJPY ? stock.costPrice * exchangeRate : stock.costPrice
+            const currentPriceUSD = isJPY ? currentPriceRaw * exchangeRate : currentPriceRaw
+
+            // Calculate profitLoss in USD: qty * (currentPrice - costPrice)
+            const profitLossUSD = stock.qty * (currentPriceUSD - costPriceUSD)
+
+            return {
+                ...stock,
+                costPriceUSD,
+                currentPriceUSD,
+                profitLossUSD,
+            }
+        })
+    }, [userStocksState, prices])
 
     const handleRequestSort = (
         event: React.MouseEvent<unknown>,
@@ -232,9 +216,7 @@ export default function UserStocksTable() {
         const selectedRow = userStocksState.find((row) => row.id === id)
         if (id === selectedId) {
             setSelectedId(-1)
-            selectedStockDispatch({
-                type: 'RESET_STOCK',
-            })
+            selectedStockDispatch({ type: 'RESET_STOCK' })
         } else {
             setSelectedId(id)
             selectedStockDispatch({
@@ -249,38 +231,47 @@ export default function UserStocksTable() {
             (row) => row.ticker === selectedStockState.selectedStock
         )
         if (newId !== undefined) {
-            setSelectedId(newId!.id)
+            setSelectedId(newId.id)
         } else {
             setSelectedId(-1)
         }
-    }, [selectedStockState.selectedStock])
+    }, [selectedStockState.selectedStock, userStocksState])
 
     const handleChangePage = (event: unknown, newPage: number) => {
         setPage(newPage)
     }
 
-    const handleChangeRowsPerPage = (
-        event: React.ChangeEvent<HTMLInputElement>
-    ) => {
+    const handleChangeRowsPerPage = (event: React.ChangeEvent<HTMLInputElement>) => {
         setRowsPerPage(parseInt(event.target.value, 10))
         setPage(0)
     }
 
     // Avoid a layout jump when reaching the last page with empty rows.
     const emptyRows =
-        page > 0
-            ? Math.max(0, (1 + page) * rowsPerPage - userStocksState.length)
-            : 0
+        page > 0 ? Math.max(0, (1 + page) * rowsPerPage - userStocksState.length) : 0
 
-    const visibleRows = React.useMemo(() =>
-        [...stocksWithPrices]
-            .sort(getComparator(order, orderBy))
-            .slice(page * rowsPerPage, page * rowsPerPage + rowsPerPage),
+    const visibleRows = React.useMemo(
+        () =>
+            [...stocksWithPrices]
+
+                .sort((a, b) => {
+                    if (orderBy === 'profitLoss') {
+                        return order === 'desc'
+                            ? b.profitLossUSD - a.profitLossUSD
+                            : a.profitLossUSD - b.profitLossUSD
+                    }
+                    // @ts-ignore
+                    return getComparator(order, orderBy)(a, b)
+                })
+                .slice(page * rowsPerPage, page * rowsPerPage + rowsPerPage),
         [stocksWithPrices, order, orderBy, page, rowsPerPage]
     )
 
     useEffect(() => {
         updateUserStocks(userStocksDispatch)
+        updatePortfolioBalance(portfolioInfoDispatch)
+        updatePortfolioInvestment(portfolioInfoDispatch)
+        updatePortfolioPercentage(portfolioInfoDispatch)
     }, [])
 
     return (
@@ -292,16 +283,8 @@ export default function UserStocksTable() {
                     selectedSymbol={selectedStockState.selectedStock}
                 />
                 <TableContainer>
-                    <Table
-                        sx={{ minWidth: 700 }}
-                        aria-labelledby="tableTitle"
-                        size={'medium'}
-                    >
-                        <EnhancedTableHead
-                            order={order}
-                            orderBy={orderBy}
-                            onRequestSort={handleRequestSort}
-                        />
+                    <Table sx={{ minWidth: 700 }} aria-labelledby="tableTitle" size={'medium'}>
+                        <EnhancedTableHead order={order} orderBy={orderBy} onRequestSort={handleRequestSort} />
                         <TableBody>
                             {visibleRows.length > 0
                                 ? visibleRows.map((row, index) => {
@@ -310,55 +293,31 @@ export default function UserStocksTable() {
                                       return (
                                           <TableRow
                                               hover
-                                              onClick={(event) =>
-                                                  handleClick(event, row.id)
-                                              }
+                                              onClick={(event) => handleClick(event, row.id)}
                                               role="checkbox"
                                               tabIndex={-1}
                                               key={row.id}
                                               selected={selectedId === row.id}
                                               sx={{ cursor: 'pointer' }}
                                           >
-                                              <TableCell
-                                                  component="th"
-                                                  id={labelId}
-                                                  scope="row"
-                                                  align="left"
-                                              >
+                                              <TableCell component="th" id={labelId} scope="row" align="left">
                                                   {row.ticker}
                                               </TableCell>
-                                              <TableCell align="left">
-                                                  {row.stockName}
+                                              <TableCell align="left">{row.stockName}</TableCell>
+                                              <TableCell align="right">{row.qty}</TableCell>
+                                              <TableCell align="right">
+                                                  {row.costPriceUSD.toFixed(2)}
                                               </TableCell>
                                               <TableCell align="right">
-                                                  {row.qty}
-                                              </TableCell>
-                                              <TableCell align="right">
-                                                  {row.costPrice}
-                                              </TableCell>
-                                              <TableCell align="right">
-                                                  {Number(
-                                                      row.currentPrice
-                                                  ).toFixed(2)}
+                                                  {row.currentPriceUSD.toFixed(2)}
                                               </TableCell>
                                               <TableCell
                                                   align="right"
                                                   style={{
-                                                      color:
-                                                          Number(
-                                                              row.profitLoss
-                                                          ) < 0 ||
-                                                          Object.is(
-                                                              Number(
-                                                                  row.profitLoss
-                                                              ),
-                                                              -0
-                                                          )
-                                                              ? 'red'
-                                                              : 'green',
+                                                      color: row.profitLossUSD < 0 ? 'red' : 'green',
                                                   }}
                                               >
-                                                  {row.profitLoss}
+                                                  {row.profitLossUSD.toFixed(2)}
                                               </TableCell>
                                           </TableRow>
                                       )
@@ -386,11 +345,7 @@ export default function UserStocksTable() {
                                       </TableRow>
                                   ))}
                             {emptyRows > 0 && (
-                                <TableRow
-                                    style={{
-                                        height: (dense ? 33 : 53) * emptyRows,
-                                    }}
-                                >
+                                <TableRow style={{ height: (dense ? 33 : 53) * emptyRows }}>
                                     <TableCell colSpan={6} />
                                 </TableRow>
                             )}
