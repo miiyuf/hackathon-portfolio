@@ -90,7 +90,10 @@ function LineGraph() {
                                 (_, i) =>
                                     new Date(
                                         date.getTime() -
-                                            (i+1) * (24 * 60 * 60 * 1000)
+                                            (lineChartView === 'stock'
+                                                ? i
+                                                : i + 1) *
+                                                (24 * 60 * 60 * 1000)
                                     )
                             )
                             .reverse(),
