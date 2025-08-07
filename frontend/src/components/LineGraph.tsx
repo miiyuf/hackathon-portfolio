@@ -48,6 +48,9 @@ function LineGraph() {
         if (lineChartView === 'portfolio') {
             getLongTermProfitLoss(10)
         }
+        if (lineChartView === 'stock') {
+            getLongTerm()
+        }
     }, [lineChartView])
 
     const handleLineChartViewChange = (
