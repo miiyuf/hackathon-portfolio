@@ -39,12 +39,19 @@ function LineGraph() {
     }
 
     useEffect(() => {
-        if (lineChartView === 'stock') {
-            getLongTerm()
-        } else {
+        setLineChartView('stock')
+        getLongTerm()
+    }, [selectedStockState.selectedStock])
+
+    useEffect(() => {
+        console.log(lineChartView)
+        if (lineChartView === 'portfolio') {
             getLongTermProfitLoss(10)
         }
-    }, [selectedStockState.selectedStock, lineChartView])
+        if (lineChartView === 'stock') {
+            getLongTerm()
+        }
+    }, [lineChartView])
 
     const handleLineChartViewChange = (
         e: React.MouseEvent<HTMLElement>,
@@ -68,7 +75,7 @@ function LineGraph() {
                 width={650}
                 series={[
                     {
-                        data: graphState.graphData || [],
+                        data: graphState.graphData,
                         label: `${lineChartView === 'stock' ? selectedStockState.selectedStock : 'P&L (%)'}`,
                         area: true,
                         showMark: false,
@@ -91,11 +98,18 @@ function LineGraph() {
                             dateFormatter.format(value),
                     },
                 ]}
-                sx={{
-                    '.MuiAreaElement-root': {
-                        fill: 'rgba(101, 199, 103, 0.5)',
+                yAxis={[
+                    {
+                        colorMap: {
+                            type: 'piecewise',
+                            thresholds: [0],
+                            colors: [
+                                'rgba(199, 101, 101, 0.5)',
+                                'rgba(101, 199, 103, 0.5)',
+                            ],
+                        },
                     },
-                }}
+                ]}
             />
             <ToggleButtonGroup
                 value={lineChartView}
