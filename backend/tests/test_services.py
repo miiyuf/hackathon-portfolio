@@ -94,5 +94,55 @@ def test_get_profit_loss(mocker):
     assert data[0]['profit_loss'] == 150 *50 - 7000
 
 
+from app.main.service.price import get_long_term_balance
+
+import pytest
+from app.main.service.price import get_long_term_balance
+
+# def test_get_long_term_balance(mocker):
+#     mock_holdings_0day = [
+#         {'symbol': 'AAPL', 'cost_price': 100.0, 'total_quantity': 10},
+#         {'symbol': 'GOOG', 'cost_price': 110.0, 'total_quantity': 5}
+#     ]
+
+#     mock_holdings_1day = [
+#         {'symbol': 'AAPL', 'cost_price': 100.0, 'total_quantity': 10},
+#         {'symbol': 'GOOG', 'cost_price': 110.0, 'total_quantity': 5}
+#     ]
+
+#     mock_holdings_2day = [
+#         {'symbol': 'AAPL', 'cost_price': 100.0, 'total_quantity': 10},
+#     ]
+
+#     mock_prices = {
+#         'AAPL': [140.0, 150.0, 160.0], 
+#         'GOOG': [270.0, 280.0, 290.0]
+#     }
+
+#     get_profit_loss = [
+#         ((140- 100) * 10)/(100* 10) * 100, 
+#         ((150- 100) * 10 + (280-110) * 5) / (100 * 10 + 110 * 5) * 100, 
+#         ((160-100) * 10 + (270-110) * 5) / (100 * 10 + 110 * 5) * 100]
+
+#     # get_holdings の side_effect: 各日付での holdings を返す
+#     mocker.patch('app.main.service.price.get_holdings', side_effect=[
+#         mock_holdings_2day,   # day=2
+#         mock_holdings_1day,  # day=1
+#         mock_holdings_0day,  # day=0
+#         ])
+
+#     # get_long_term_price をシンボルごとに返す
+#     mocker.patch('app.main.service.price.get_long_term_price', side_effect=lambda symbol, days: mock_prices[symbol])
+
+#     result = get_long_term_balance(days=3)
+
+    # # 簡単なチェック
+    # assert isinstance(result, list)
+    # assert len(result) == 3
+
+    # # 期待される計算結果を事前に計算しておいてもよい（以下は省略）
+    # print("Result:", result)
+
+
 
 
