@@ -55,6 +55,13 @@ function Market() {
 
     const [sortConfig, setSortConfig] = useState<{ key: keyof StockData, direction: 'asc' | 'desc' } | null>(null)
 
+    const exchangeRate = 0.0068
+
+    const formatPriceInUSD = (priceJPY: number) => {
+        const priceUSD = priceJPY * exchangeRate
+        return priceUSD.toLocaleString('en-US', { style: 'currency', currency: 'USD' })
+    }
+
     const sortedStocks = React.useMemo(() => {
     if (!sortConfig) return stocks
 
@@ -286,7 +293,7 @@ function Market() {
                                             <strong>{stock.symbol}</strong>
                                         </TableCell>
                                         <TableCell>{stock.name}</TableCell>
-                                        <TableCell align="right">{stock.price.toFixed(2)}</TableCell>
+                                        <TableCell align="right">{formatPriceInUSD(stock.price)}</TableCell>
                                         <TableCell 
                                             align="right"
                                             sx={{ color: getChangeColor(stock.change) }}
@@ -344,8 +351,9 @@ function Market() {
                             Company: <strong>{selectedStock?.name}</strong>
                         </Typography>
                         <Typography variant="body1" sx={{ mt: 1 }}>
-                            Current Price: <strong>${selectedStock?.price.toFixed(2)}</strong>
+                            Current Price: <strong>{selectedStock ? formatPriceInUSD(selectedStock.price) : ''}</strong>
                         </Typography>
+
                         
                         <TextField
                             label="Quantity"
@@ -358,10 +366,11 @@ function Market() {
                         />
                         
                         {quantity > 0 && selectedStock && (
-                            <Typography variant="body1" sx={{ mt: 2 }}>
-                                Total: <strong>${(quantity * selectedStock.price).toFixed(2)}</strong>
-                            </Typography>
+                        <Typography variant="body1" sx={{ mt: 2 }}>
+                            Total: <strong>{formatPriceInUSD(quantity * selectedStock.price)}</strong>
+                        </Typography>
                         )}
+                        
                     </Box>
                 </DialogContent>
                 <DialogActions>
