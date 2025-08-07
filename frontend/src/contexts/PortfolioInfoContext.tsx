@@ -4,6 +4,7 @@ import { fetchTotalPortfolioBalance } from '../api/stocks'
 interface PortfolioInfoState {
     portfolioBalance: string | undefined
     portfolioInvestment: string | undefined
+    portfolioPercentage: string | undefined
 }
 
 interface PortfolioInfoContextType {
@@ -17,6 +18,7 @@ interface PortfolioInfoContextType {
 const initPortfolioInfoState: PortfolioInfoState = {
     portfolioBalance: '',
     portfolioInvestment: '',
+    portfolioPercentage: '',
 }
 
 const initPortfolioInfoContext: PortfolioInfoContextType = {
@@ -46,6 +48,11 @@ function portfolioInfoReducer(
                 ...state,
                 portfolioInvestment: action.state?.portfolioInvestment,
             }
+        case 'UPDATE_PL':
+            return {
+                ...state,
+                portfolioPercentage: action.state?.portfolioPercentage,
+            }
         default:
             throw new Error(`Unknown action type: ${action.type}`)
     }
@@ -67,6 +74,7 @@ export const updatePortfolioBalance = async (
         state: {
             portfolioBalance: portfolioData.total_portfolio_balance,
             portfolioInvestment: '',
+            portfolioPercentage: '',
         },
     })
 }
@@ -83,6 +91,24 @@ export const updatePortfolioInvestment = async (
         state: {
             portfolioBalance: '',
             portfolioInvestment: portfolioData.total_net_investment,
+            portfolioPercentage: '',
+        },
+    })
+}
+
+export const updatePortfolioPercentage = async (
+    portfolioInfoDispatch: React.Dispatch<{
+        type: string
+        state?: PortfolioInfoState
+    }>
+) => {
+    const portfolioData = await fetchTotalPortfolioBalance()
+    portfolioInfoDispatch({
+        type: 'UPDATE_PL',
+        state: {
+            portfolioBalance: '',
+            portfolioInvestment: '',
+            portfolioPercentage: portfolioData.profit_loss,
         },
     })
 }

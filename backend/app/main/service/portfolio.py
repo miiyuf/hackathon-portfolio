@@ -81,15 +81,17 @@ def get_portfolio():
             holding['unrealized_profit_loss'] = None
             
         detailed_holdings.append(holding)
-
+    profit_loss = ((total_portfolio_balance - total_net_investment) / total_net_investment) * 100
     # Final Summary Log
     logger.info(f"Final calculated portfolio net investment: {total_net_investment}")
     logger.info(f"Final calculated portfolio current balance: {total_portfolio_balance}")
+    logger.info(f"Final calculated portfolio p&l (%): {profit_loss}")
 
     # Response Object Creation
     response_data = {
         'total_net_investment': str(total_net_investment),
         'total_portfolio_balance': str(total_portfolio_balance),
+        'profit_loss': str(profit_loss),
         'holdings': detailed_holdings,
         'stats': {
             'total_holdings': len(holdings),

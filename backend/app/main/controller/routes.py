@@ -271,3 +271,18 @@ def get_japan_stocks():
         return jsonify({"error": "Failed to get Japan stocks data"}), 500
 
 
+@price_bp.route('/long_term_price/<symbol>', methods=['GET'])
+def get_long_stock_price(symbol):
+    result = Price.get_long_stock_price(symbol)
+    if result is None:
+        return jsonify({"error": f"Could not fetch long-term price for symbol: {symbol}"}), 500
+    return result
+
+
+@price_bp.route('/long_term_balance/<days>', methods=['GET'])
+def get_long_term_balance(days):
+    num_days = int(days)
+    result = Price.get_long_term_balance(num_days)
+    if result is None:
+        return jsonify({"error": "Could not fetch long-term balance"}), 500
+    return result
