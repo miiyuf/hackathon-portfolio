@@ -42,7 +42,7 @@ def get_long_term_balance(days=10):
     cur_prices_all = {}
         
     for day in range(days):
-        end_date = str(date.today() - timedelta(days=days-day-1)) # day 0 is 'days' days ago
+        end_date = str(date.today() - timedelta(days=days-day)) # day 0 is 'days' days ago
         holdings = get_holdings(end_date) # get state of holdings up until day
         total_cost_price = 0
         logger.info(holdings)
@@ -53,7 +53,7 @@ def get_long_term_balance(days=10):
             quantity = holding.get('total_quantity', 0)
 
 
-            cur_prices = cur_prices_all.get(holding['symbol'], get_long_term_price(holding.get('symbol'), days))
+            cur_prices = cur_prices_all.get(holding['symbol'], get_long_term_price(holding.get('symbol'), days+1))
             cur_price = cur_prices[day]
 
 
