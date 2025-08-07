@@ -205,7 +205,6 @@ export default function UserStocksTable() {
         })
     }, [userStocksState, prices])
 
->>>>>>> Stashed changes
     const handleRequestSort = (
         event: React.MouseEvent<unknown>,
         property: keyof UserStockState
