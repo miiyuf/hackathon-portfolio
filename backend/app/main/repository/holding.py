@@ -37,7 +37,6 @@ def get_holdings(day=None):
         GROUP BY s.symbol, sm.name
         HAVING total_quantity > 0;"""
 
-    logger.info(f"Executing query: {query}")
         
     cursor.execute(query)
     results = cursor.fetchall()
