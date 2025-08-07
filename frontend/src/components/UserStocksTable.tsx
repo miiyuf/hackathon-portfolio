@@ -4,6 +4,12 @@ import { alpha } from '@mui/material/styles'
 import { useSelectedStockContext } from '../contexts/SelectedStockContext'
 import { useTradingContext } from '../contexts/TradingContext'
 import {
+    updatePortfolioBalance,
+    updatePortfolioInvestment,
+    updatePortfolioPercentage,
+    usePortfolioInfoContext,
+} from '../contexts/PortfolioInfoContext'
+import {
     Box,
     Table,
     TableBody,
@@ -23,7 +29,6 @@ import { useUserStocksContext } from '../contexts/UserStocksContext'
 import { type UserStockState } from '../contexts/UserStocksContext'
 import { updateUserStocks } from '../contexts/UserStocksContext'
 import { useCurrentPrices } from '../contexts/CurrentPricesContext'
-
 
 function descendingComparator<T>(a: T, b: T, orderBy: keyof T) {
     if (b[orderBy] < a[orderBy]) {
@@ -190,7 +195,8 @@ function EnhancedTableToolbar(props: EnhancedTableToolbarProps) {
 }
 
 export default function UserStocksTable() {
-    // const { handleStockSelection } = props
+    const { portfolioInfoDispatch, portfolioInfoState } =
+        usePortfolioInfoContext()
     const { selectedStockState, selectedStockDispatch } =
         useSelectedStockContext()
     const [order, setOrder] = React.useState<Order>('asc')
@@ -211,13 +217,11 @@ export default function UserStocksTable() {
     }
 
     const stocksWithPrices = React.useMemo(() => {
-        return userStocksState.map(stock => ({
+        return userStocksState.map((stock) => ({
             ...stock,
             currentPrice: prices[stock.ticker] ?? stock.currentPrice ?? 0,
         }))
     }, [userStocksState, prices])
-
-    
 
     const handleRequestSort = (
         event: React.MouseEvent<unknown>,
@@ -272,15 +276,19 @@ export default function UserStocksTable() {
             ? Math.max(0, (1 + page) * rowsPerPage - userStocksState.length)
             : 0
 
-    const visibleRows = React.useMemo(() =>
-        [...stocksWithPrices]
-            .sort(getComparator(order, orderBy))
-            .slice(page * rowsPerPage, page * rowsPerPage + rowsPerPage),
+    const visibleRows = React.useMemo(
+        () =>
+            [...stocksWithPrices]
+                .sort(getComparator(order, orderBy))
+                .slice(page * rowsPerPage, page * rowsPerPage + rowsPerPage),
         [stocksWithPrices, order, orderBy, page, rowsPerPage]
     )
 
     useEffect(() => {
         updateUserStocks(userStocksDispatch)
+        updatePortfolioBalance(portfolioInfoDispatch)
+        updatePortfolioInvestment(portfolioInfoDispatch)
+        updatePortfolioPercentage(portfolioInfoDispatch)
     }, [])
 
     return (

@@ -39,12 +39,16 @@ function LineGraph() {
     }
 
     useEffect(() => {
-        if (lineChartView === 'stock') {
-            getLongTerm()
-        } else {
+        setLineChartView('stock')
+        getLongTerm()
+    }, [selectedStockState.selectedStock])
+
+    useEffect(() => {
+        console.log(lineChartView)
+        if (lineChartView === 'portfolio') {
             getLongTermProfitLoss(10)
         }
-    }, [selectedStockState.selectedStock, lineChartView])
+    }, [lineChartView])
 
     const handleLineChartViewChange = (
         e: React.MouseEvent<HTMLElement>,
@@ -68,7 +72,7 @@ function LineGraph() {
                 width={650}
                 series={[
                     {
-                        data: graphState.graphData || [],
+                        data: graphState.graphData,
                         label: `${lineChartView === 'stock' ? selectedStockState.selectedStock : 'P&L (%)'}`,
                         area: true,
                         showMark: false,
