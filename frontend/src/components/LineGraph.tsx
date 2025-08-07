@@ -90,7 +90,7 @@ function LineGraph() {
                                 (_, i) =>
                                     new Date(
                                         date.getTime() -
-                                            i * (24 * 60 * 60 * 1000)
+                                            (i+1) * (24 * 60 * 60 * 1000)
                                     )
                             )
                             .reverse(),
