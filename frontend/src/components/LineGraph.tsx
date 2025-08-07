@@ -5,8 +5,11 @@ import { ToggleButton, ToggleButtonGroup } from '@mui/material'
 import { fetchLongTermStockHistory } from '../api/stocks'
 import { useGraphContext } from '../contexts/GraphContext'
 import { useSelectedStockContext } from '../contexts/SelectedStockContext'
+import { fetchLongTermProfitLoss } from '../api/stocks'
 
 function LineGraph() {
+    const [lineGraphData, setLineGraphData] = useState<number[]>([])
+    const [lineChartView, setLineChartView] = useState('stock')
     const { graphState, graphDispatch } = useGraphContext()
     const { selectedStockDispatch, selectedStockState } =
         useSelectedStockContext()
@@ -19,19 +22,37 @@ function LineGraph() {
                 type: 'INIT_GRAPH',
                 state: { graphData: stockHistory },
             })
+        } else {
+            graphDispatch({
+                type: 'INIT_GRAPH',
+                state: { graphData: [] },
+            })
         }
     }
-    useEffect(() => {
-        getLongTerm()
-    }, [selectedStockState.selectedStock])
 
-    const [lineGraphData, setLineGraphData] = useState<number[]>([])
-    const [lineChartView, setLineChartView] = useState('stock')
+    const getLongTermProfitLoss = async (days: number) => {
+        const plhistory = await fetchLongTermProfitLoss(days)
+        graphDispatch({
+            type: 'INIT_GRAPH',
+            state: { graphData: plhistory },
+        })
+    }
+
+    useEffect(() => {
+        if (lineChartView === 'stock') {
+            getLongTerm()
+        } else {
+            getLongTermProfitLoss(10)
+        }
+    }, [selectedStockState.selectedStock, lineChartView])
+
     const handleLineChartViewChange = (
         e: React.MouseEvent<HTMLElement>,
         newView: string
     ) => {
-        setLineChartView(newView)
+        if (newView !== null) {
+            setLineChartView(newView)
+        }
     }
     const dateFormatter = Intl.DateTimeFormat(undefined, {
         month: '2-digit',
@@ -47,8 +68,8 @@ function LineGraph() {
                 width={650}
                 series={[
                     {
-                        data: graphState.graphData,
-                        label: `${selectedStockState.selectedStock}`,
+                        data: graphState.graphData || [],
+                        label: `${lineChartView === 'stock' ? selectedStockState.selectedStock : 'P&L (%)'}`,
                         area: true,
                         showMark: false,
                         color: 'rgba(28, 144, 30, 0.5)',

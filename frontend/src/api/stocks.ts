@@ -89,6 +89,7 @@ export interface PortfolioData {
     holdings: HoldingData[]
     total_net_investment: string
     total_portfolio_balance: string
+    profit_loss: string
 }
 
 export const fetchTotalPortfolioBalance = async (): Promise<PortfolioData> => {
@@ -108,6 +109,17 @@ export const fetchLongTermStockHistory = async (
     try {
         const response = await API.get(`/api/long_term_price/${symbol}`)
         return response.data.long_term_price
+    } catch (error) {
+        console.error('Error fetching profit/loss data:', error)
+        throw error
+    }
+}
+
+export const fetchLongTermProfitLoss = async (days: number): Promise<[]> => {
+    try {
+        const response = await API.get(`/api/long_term_balance/${days}`)
+        console.log(response)
+        return response.data.long_term_balance
     } catch (error) {
         console.error('Error fetching profit/loss data:', error)
         throw error

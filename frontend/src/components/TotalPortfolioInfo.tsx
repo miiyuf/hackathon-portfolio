@@ -4,11 +4,11 @@ import { useEffect } from 'react'
 import {
     updatePortfolioInvestment,
     usePortfolioInfoContext,
+    updatePortfolioPercentage,
 } from '../contexts/PortfolioInfoContext'
 import { updatePortfolioBalance } from '../contexts/PortfolioInfoContext'
 import TrendingUpIcon from '@mui/icons-material/TrendingUp'
 import TrendingDownIcon from '@mui/icons-material/TrendingDown'
-
 // total portfolio balance = current price * owned stock
 // total portfolio investment = cost price * owned stock
 
@@ -19,6 +19,7 @@ function TotalPortfolioInfo() {
     useEffect(() => {
         updatePortfolioBalance(portfolioInfoDispatch)
         updatePortfolioInvestment(portfolioInfoDispatch)
+        updatePortfolioPercentage(portfolioInfoDispatch)
     }, [])
 
     return (
@@ -58,8 +59,21 @@ function TotalPortfolioInfo() {
                     )}
                 </div>
                 <div>
-                    <Typography pl={2} variant="h4">
-                        (%x)
+                    <Typography
+                        pl={2}
+                        variant="h4"
+                        style={{
+                            color:
+                                Number(portfolioInfoState.portfolioBalance) > 0
+                                    ? '#55cb38ff'
+                                    : 'red',
+                        }}
+                    >
+                        (%
+                        {Number(portfolioInfoState.portfolioPercentage).toFixed(
+                            2
+                        )}
+                        )
                     </Typography>
                 </div>
             </div>
