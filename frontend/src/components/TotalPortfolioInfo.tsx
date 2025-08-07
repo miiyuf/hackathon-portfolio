@@ -42,7 +42,7 @@ function TotalPortfolioInfo() {
                     <span
                         style={{
                             color:
-                                Number(portfolioInfoState.portfolioBalance) > 0
+                                Number(portfolioInfoState.portfolioBalance) >= 0
                                     ? '#55cb38ff'
                                     : 'red',
                         }}
@@ -52,7 +52,7 @@ function TotalPortfolioInfo() {
                     </span>
                 </Typography>
                 <div style={{ marginLeft: 10 }}>
-                    {Number(portfolioInfoState.portfolioBalance) > 0 ? (
+                    {Number(portfolioInfoState.portfolioBalance) >= 0 ? (
                         <TrendingUpIcon style={{ color: '#55cb38ff' }} />
                     ) : (
                         <TrendingDownIcon style={{ color: 'red' }} />
@@ -64,7 +64,7 @@ function TotalPortfolioInfo() {
                         variant="h4"
                         style={{
                             color:
-                                Number(portfolioInfoState.portfolioBalance) > 0
+                                Number(portfolioInfoState.portfolioBalance) >= 0
                                     ? '#55cb38ff'
                                     : 'red',
                         }}
