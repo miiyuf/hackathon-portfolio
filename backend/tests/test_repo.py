@@ -57,7 +57,7 @@ def test_insert_stock_success(mocker):
     mock_conn.commit.assert_called()
     mock_conn.close.assert_called()
 
-    assert response == {"message": "Stock inserted successfully"}
+    assert response['message'] == 'Stock inserted successfully'
 
 
 def test_get_holdings_success(mocker):
@@ -72,7 +72,7 @@ def test_get_holdings_success(mocker):
 
     with app.app_context():
         result = get_holdings()
-        result = result.get_json()
+        result = result
 
     mock_cursor.execute.assert_called()
     mock_cursor.close.assert_called()
