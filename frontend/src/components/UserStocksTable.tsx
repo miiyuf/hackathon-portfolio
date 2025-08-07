@@ -160,8 +160,6 @@ const exchangeRate = 0.0068
 export default function UserStocksTable() {
     const { portfolioInfoDispatch, portfolioInfoState } =
         usePortfolioInfoContext()
-    const { selectedStockState, selectedStockDispatch } =
-        useSelectedStockContext()
     const { selectedStockState, selectedStockDispatch } = useSelectedStockContext()
     const [order, setOrder] = React.useState<Order>('asc')
     const [orderBy, setOrderBy] = React.useState<keyof UserStockState>('ticker')
