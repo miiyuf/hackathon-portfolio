@@ -1,6 +1,7 @@
 import { createContext, useReducer, useContext, useEffect } from 'react'
 import { fetchPortfolioData } from '../api/stocks'
 import { useTradingContext } from './TradingContext'
+import { useCurrentPrices } from '../contexts/CurrentPricesContext'
 
 export interface UserStockState {
     id: number

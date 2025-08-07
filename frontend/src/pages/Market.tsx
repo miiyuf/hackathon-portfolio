@@ -1,7 +1,294 @@
-import React from 'react'
+import React, { useState, useEffect } from 'react'
+import { 
+    Paper, 
+    Table, 
+    TableBody, 
+    TableCell, 
+    TableContainer, 
+    TableHead, 
+    TableRow, 
+    Typography,
+    CircularProgress,
+    Box,
+    Button,
+    Dialog,
+    DialogTitle,
+    DialogContent,
+    DialogActions,
+    TextField,
+    Snackbar,
+    Alert
+} from '@mui/material'
+import { API } from '../api/stocks'
+
+interface StockData {
+    symbol: string
+    name: string
+    price: number
+    change: number
+    changePercent: number
+    volume: number
+}
+
+type TransactionType = 'buy' | 'sell'
 
 function Market() {
-    return <div className="internal-tab">DISPLAY STOCKS HERE</div>
+    const [stocks, setStocks] = useState<StockData[]>([])
+    const [loading, setLoading] = useState<boolean>(true)
+    const [error, setError] = useState<string | null>(null)
+    const [openModal, setOpenModal] = useState<boolean>(false)
+    const [selectedStock, setSelectedStock] = useState<StockData | null>(null)
+    const [transactionType, setTransactionType] = useState<TransactionType>('buy')
+    const [quantity, setQuantity] = useState<number>(0)
+    const [transactionInProgress, setTransactionInProgress] = useState<boolean>(false)
+    const [notification, setNotification] = useState<{
+        open: boolean,
+        message: string,
+        severity: 'success' | 'error' | 'info'
+    }>({
+        open: false,
+        message: '',
+        severity: 'info'
+    })
+
+    useEffect(() => {
+        const fetchTopStocks = async () => {
+            try {
+                setLoading(true)
+                const response = await API.get('/api/japan_stocks')
+                
+                if (Array.isArray(response.data)) {
+                    setStocks(response.data)
+                } else if (response.data && typeof response.data === 'object') {
+                    if (Array.isArray(response.data.data)) {
+                        setStocks(response.data.data)
+                    } else if (Array.isArray(response.data.results)) {
+                        setStocks(response.data.results)
+                    } else {
+                        console.error('Unexpected API response format:', response.data)
+                        setStocks([])
+                        setError('Invalid data format received from server')
+                    }
+                } else {
+                    console.error('Unexpected API response type:', response.data)
+                    setStocks([])
+                    setError('Invalid response from server')
+                }
+            } catch (err) {
+                console.error('Error fetching top stocks:', err)
+                
+                if (err.response) {
+                    console.error('Error response:', err.response.status, err.response.data)
+                } else if (err.request) {
+                    console.error('Error request:', err.request)
+                }
+                
+                setError('Failed to load stock data')
+                setStocks([])
+            } finally {
+                setLoading(false)
+            }
+        }
+
+        fetchTopStocks()
+    }, [])
+
+    const getChangeColor = (change: number) => {
+        return change >= 0 ? 'success.main' : 'error.main'
+    }
+
+    const handleOpenTransactionModal = (stock: StockData, type: TransactionType) => {
+        setSelectedStock(stock)
+        setTransactionType(type)
+        setQuantity(0)
+        setOpenModal(true)
+    }
+
+    const handleCloseModal = () => {
+        setOpenModal(false)
+        setSelectedStock(null)
+    }
+
+    const handleExecuteTransaction = async () => {
+        if (!selectedStock || quantity <= 0) return
+        
+        try {
+            setTransactionInProgress(true)
+            
+            const response = await API.post('/api/stocks', {
+                symbol: selectedStock.symbol,
+                action: transactionType,
+                quantity: quantity
+            })
+            
+            setNotification({
+                open: true,
+                message: `Successfully ${transactionType === 'buy' ? 'purchased' : 'sold'} ${quantity} shares of ${selectedStock.symbol}`,
+                severity: 'success'
+            })
+            
+            handleCloseModal()
+        } catch (err) {
+            console.error('Transaction error:', err)
+            
+            setNotification({
+                open: true,
+                message: `Transaction failed: ${err.response?.data?.message || 'Unknown error'}`,
+                severity: 'error'
+            })
+        } finally {
+            setTransactionInProgress(false)
+        }
+    }
+
+    const handleCloseNotification = () => {
+        setNotification({...notification, open: false})
+    }
+
+    return (
+        <div className="internal-tab">
+            <Typography variant="h4" gutterBottom sx={{ fontWeight: 'bold', mb: 3 }}>
+                Tokyo Stock Exchange Market
+            </Typography>
+
+            {loading ? (
+                <Box sx={{ display: 'flex', justifyContent: 'center', mt: 4 }}>
+                    <CircularProgress />
+                </Box>
+            ) : error ? (
+                <Typography color="error">{error}</Typography>
+            ) : (
+                <TableContainer component={Paper}>
+                    <Table sx={{ minWidth: 650 }} aria-label="stock market table">
+                        <TableHead>
+                            <TableRow>
+                                <TableCell>Symbol</TableCell>
+                                <TableCell>Company</TableCell>
+                                <TableCell align="right">Price ($)</TableCell>
+                                <TableCell align="right">Change</TableCell>
+                                <TableCell align="right">Change %</TableCell>
+                                <TableCell align="right">Volume</TableCell>
+                                <TableCell align="center">Actions</TableCell>
+                            </TableRow>
+                        </TableHead>
+                        <TableBody>
+                            {Array.isArray(stocks) && stocks.length > 0 ? (
+                                stocks.map((stock) => (
+                                    <TableRow
+                                        key={stock.symbol}
+                                        sx={{ '&:last-child td, &:last-child th': { border: 0 } }}
+                                    >
+                                        <TableCell component="th" scope="row">
+                                            <strong>{stock.symbol}</strong>
+                                        </TableCell>
+                                        <TableCell>{stock.name}</TableCell>
+                                        <TableCell align="right">{stock.price.toFixed(2)}</TableCell>
+                                        <TableCell 
+                                            align="right"
+                                            sx={{ color: getChangeColor(stock.change) }}
+                                        >
+                                            {stock.change >= 0 ? '+' : ''}{stock.change.toFixed(2)}
+                                        </TableCell>
+                                        <TableCell 
+                                            align="right"
+                                            sx={{ color: getChangeColor(stock.changePercent) }}
+                                        >
+                                            {stock.change >= 0 ? '+' : ''}{stock.changePercent.toFixed(2)}%
+                                        </TableCell>
+                                        <TableCell align="right">{stock.volume.toLocaleString()}</TableCell>
+                                        <TableCell align="center">
+                                            <Box sx={{ display: 'flex', justifyContent: 'center', gap: 1 }}>
+                                                <Button 
+                                                    size="small" 
+                                                    variant="contained" 
+                                                    color="success" 
+                                                    onClick={() => handleOpenTransactionModal(stock, 'buy')}
+                                                >
+                                                    Buy
+                                                </Button>
+                                                <Button 
+                                                    size="small" 
+                                                    variant="contained" 
+                                                    color="error"
+                                                    onClick={() => handleOpenTransactionModal(stock, 'sell')}
+                                                >
+                                                    Sell
+                                                </Button>
+                                            </Box>
+                                        </TableCell>
+                                    </TableRow>
+                                ))
+                            ) : (
+                                <TableRow>
+                                    <TableCell colSpan={7} align="center">
+                                        No stock data available
+                                    </TableCell>
+                                </TableRow>
+                            )}
+                        </TableBody>
+                    </Table>
+                </TableContainer>
+            )}
+
+            <Dialog open={openModal} onClose={handleCloseModal}>
+                <DialogTitle>
+                    {transactionType === 'buy' ? 'Buy' : 'Sell'} {selectedStock?.symbol}
+                </DialogTitle>
+                <DialogContent>
+                    <Box sx={{ my: 2 }}>
+                        <Typography variant="body1">
+                            Company: <strong>{selectedStock?.name}</strong>
+                        </Typography>
+                        <Typography variant="body1" sx={{ mt: 1 }}>
+                            Current Price: <strong>${selectedStock?.price.toFixed(2)}</strong>
+                        </Typography>
+                        
+                        <TextField
+                            label="Quantity"
+                            type="number"
+                            fullWidth
+                            margin="normal"
+                            value={quantity}
+                            onChange={(e) => setQuantity(parseInt(e.target.value) || 0)}
+                            InputProps={{ inputProps: { min: 1 } }}
+                        />
+                        
+                        {quantity > 0 && selectedStock && (
+                            <Typography variant="body1" sx={{ mt: 2 }}>
+                                Total: <strong>${(quantity * selectedStock.price).toFixed(2)}</strong>
+                            </Typography>
+                        )}
+                    </Box>
+                </DialogContent>
+                <DialogActions>
+                    <Button onClick={handleCloseModal}>Cancel</Button>
+                    <Button 
+                        variant="contained" 
+                        color={transactionType === 'buy' ? 'success' : 'error'}
+                        disabled={!quantity || quantity <= 0 || transactionInProgress}
+                        onClick={handleExecuteTransaction}
+                    >
+                        {transactionInProgress ? 'Processing...' : transactionType === 'buy' ? 'Buy Shares' : 'Sell Shares'}
+                    </Button>
+                </DialogActions>
+            </Dialog>
+
+            <Snackbar 
+                open={notification.open} 
+                autoHideDuration={6000} 
+                onClose={handleCloseNotification}
+                anchorOrigin={{ vertical: 'bottom', horizontal: 'center' }}
+            >
+                <Alert 
+                    onClose={handleCloseNotification} 
+                    severity={notification.severity}
+                    variant="filled"
+                >
+                    {notification.message}
+                </Alert>
+            </Snackbar>
+        </div>
+    )
 }
 
 export default Market

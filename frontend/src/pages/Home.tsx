@@ -4,6 +4,8 @@ import './Home.css'
 import PieChart from '../components/PieChart'
 import LineGraph from '../components/LineGraph'
 import TotalPortfolioInfo from '../components/TotalPortfolioInfo'
+import { useCurrentPrices } from '../contexts/CurrentPricesContext'
+
 import { fetchLongTermStockHistory } from '../api/stocks'
 
 function Home() {
@@ -15,7 +17,7 @@ function Home() {
                 <LineGraph />
             </div>
             <div style={{ marginTop: 30 }}>
-                <UserStocksTable />
+                <UserStocksTable /*current_prices={ current_prices }*/ />
             </div>
         </div>
     )
