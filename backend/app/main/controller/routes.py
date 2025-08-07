@@ -9,6 +9,7 @@ import logging
 import numpy as np
 import pandas as pd
 import os
+import sys
 
 logger = logging.getLogger(__name__)
 logging.basicConfig(level=logging.DEBUG)
@@ -26,8 +27,13 @@ cached_japan_stocks = []
 japan_last_update_time = 0
 
 def load_japan_symbols():
+    logger.info("=== ENTERING load_japan_symbols ===") 
+    logger.warning("=== Entering load_japan_symbols ===")
     try:
         csv_path = os.path.join(os.path.dirname(__file__), 'data_j.csv')
+        logger.warning(f"Looking for CSV at absolute path: {os.path.abspath(csv_path)}")
+        logger.info(f"[DEBUG] CSV absolute path: {os.path.abspath(csv_path)}", file=sys.stderr)
+        logger.info(f"[DEBUG] Exists? {os.path.exists(csv_path)}", file=sys.stderr)
         current_dir = os.getcwd()
         logger.warning(f"Current working directory: {current_dir}")
         
@@ -38,10 +44,11 @@ def load_japan_symbols():
         
         df = pd.read_csv(csv_path, encoding='utf-8')
         
-        # プライム市場の株式（ETFなど除く）を抽出
-        prime_stocks = df[df['市場・商品区分'].str.contains('プライム（内国株式）', na=False)]
+        prime_stocks = df[
+        (df['市場・商品区分'].str.contains('プライム（内国株式）', na=False)) & (df['規模区分'] == 'TOPIX Large')
+        ]
         
-        selected_stocks = prime_stocks[['コード', '銘柄名']].head(limit)
+        selected_stocks = prime_stocks[['コード', '銘柄名']]
         
         symbols = [f"{code}.T" for code in selected_stocks['コード'].astype(str)]
         
