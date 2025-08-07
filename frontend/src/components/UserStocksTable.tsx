@@ -22,6 +22,8 @@ import { visuallyHidden } from '@mui/utils'
 import { useUserStocksContext } from '../contexts/UserStocksContext'
 import { type UserStockState } from '../contexts/UserStocksContext'
 import { updateUserStocks } from '../contexts/UserStocksContext'
+import { useCurrentPrices } from '../contexts/CurrentPricesContext'
+
 
 function descendingComparator<T>(a: T, b: T, orderBy: keyof T) {
     if (b[orderBy] < a[orderBy]) {
@@ -198,6 +200,7 @@ export default function UserStocksTable() {
     const [dense, setDense] = React.useState(false)
     const [rowsPerPage, setRowsPerPage] = React.useState(3)
     const { userStocksState, userStocksDispatch } = useUserStocksContext()
+    const { prices } = useCurrentPrices()
 
     const { tradingModalState, tradingModalDispatch } = useTradingContext()
     const handleUserOpen = () => {
@@ -206,6 +209,15 @@ export default function UserStocksTable() {
             state: { isOpen: true, symbol: selectedStockState.selectedStock },
         })
     }
+
+    const stocksWithPrices = React.useMemo(() => {
+        return userStocksState.map(stock => ({
+            ...stock,
+            currentPrice: prices[stock.ticker] ?? stock.currentPrice ?? 0,
+        }))
+    }, [userStocksState, prices])
+
+    
 
     const handleRequestSort = (
         event: React.MouseEvent<unknown>,
@@ -249,12 +261,11 @@ export default function UserStocksTable() {
             ? Math.max(0, (1 + page) * rowsPerPage - userStocksState.length)
             : 0
 
-    const visibleRows = React.useMemo(
-        () =>
-            [...userStocksState]
-                .sort(getComparator(order, orderBy))
-                .slice(page * rowsPerPage, page * rowsPerPage + rowsPerPage),
-        [order, orderBy, page, rowsPerPage, userStocksState]
+    const visibleRows = React.useMemo(() =>
+        [...stocksWithPrices]
+            .sort(getComparator(order, orderBy))
+            .slice(page * rowsPerPage, page * rowsPerPage + rowsPerPage),
+        [stocksWithPrices, order, orderBy, page, rowsPerPage]
     )
 
     useEffect(() => {

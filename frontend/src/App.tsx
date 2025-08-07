@@ -8,6 +8,7 @@ import TradingAction from './components/TradingAction'
 import History from './pages/History'
 import { ThemeProvider, createTheme } from '@mui/material/styles'
 import { CssBaseline } from '@mui/material'
+import { CurrentPricesProvider } from './contexts/CurrentPricesContext';
 
 // Google Fontsをインポート
 import '@fontsource/montserrat/400.css'
@@ -120,17 +121,20 @@ const theme = createTheme({
 function App() {
     return (
         <ThemeProvider theme={theme}>
-            <CssBaseline />             <div className="flex">
-                <Sidebar />
-                <Routes>
-                    <Route path="/" element={<Home />} />
-                    <Route path="/history" element={<History />} />
-                    <Route path="/market" element={<Market />} />
-                </Routes>
-                <TradingAction />
-            </div>
+            <CssBaseline />
+            <CurrentPricesProvider>
+                <div className="flex">
+                    <Sidebar />
+                    <Routes>
+                        <Route path="/" element={<Home />} />
+                        <Route path="/history" element={<History />} />
+                        <Route path="/market" element={<Market />} />
+                    </Routes>
+                    <TradingAction />
+                </div>
+            </CurrentPricesProvider>
         </ThemeProvider>
-    )
+    );
 }
 
 export default App
